@@ -1,0 +1,25 @@
+name: Glacier & Ice Melt Tracker
+quip: Change you can measure
+description: |
+  Tracks glacier outlines and ice-melt rates across the Alps using radar and optical imagery, with validated annual statistics.
+
+repo_url: https://example.org/glacier-tracker
+website: https://example.org/glacier-tracker/site
+demo_url: https://example.org/glacier-tracker/demo
+docs_url: https://example.org/glacier-tracker/docs
+
+screenshot_url: images/glacier-tracker.svg
+
+category: Climate
+tags: [climate, satellite, validation]
+stack: [Python, GDAL, Docker]
+
+status: active
+featured: true
+version: 1.2.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2025-11-05
+updated_on: 2026-11-01

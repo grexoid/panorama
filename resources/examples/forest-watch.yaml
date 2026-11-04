@@ -1,0 +1,27 @@
+name: Forest Watch
+quip: Deforestation, seen from orbit
+description: |
+  Detects forest cover loss from Sentinel-2 time series using a lightweight segmentation model and flags hotspots for follow-up.
+  
+  Results are published as monthly GeoTIFFs and a vector layer of change polygons.
+
+repo_url: https://example.org/forest-watch
+website: https://example.org/forest-watch/site
+demo_url: https://example.org/forest-watch/demo
+docs_url: https://example.org/forest-watch/docs
+
+screenshot_url: images/forest-watch.svg
+
+category: Earth Observation
+tags: [satellite, forestry, prototype]
+stack: [Python, PyTorch, STAC]
+
+status: beta
+featured: true
+version: 1.4.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2026-08-12
+updated_on: 2026-10-30

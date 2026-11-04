@@ -1,0 +1,25 @@
+name: Wildlife Sound Classifier
+quip: Biodiversity by ear
+description: |
+  Identifies bird and amphibian species from field audio recordings, running on low-power edge devices in the field.
+
+repo_url: https://example.org/sound-classifier
+website: https://example.org/sound-classifier/site
+demo_url: https://example.org/sound-classifier/demo
+docs_url: https://example.org/sound-classifier/docs
+
+screenshot_url: images/sound-classifier.svg
+
+category: Biodiversity
+tags: [audio, biodiversity, testing]
+stack: [Python, TensorFlow Lite]
+
+status: beta
+featured: false
+version: 1.3.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2026-06-20
+updated_on: 2026-10-02

@@ -1,0 +1,25 @@
+name: Land Cover Classifier v1
+quip: The one we learned from
+description: |
+  First-generation land cover classifier. Superseded by newer tooling but kept for reproducibility of published results.
+
+repo_url: https://example.org/old-landcover
+website: https://example.org/old-landcover/site
+
+docs_url: https://example.org/old-landcover/docs
+
+screenshot_url: images/old-landcover.svg
+
+category: Geospatial AI
+tags: [land use, modelling]
+stack: [R, Docker]
+
+status: archived
+featured: false
+version: 1.1.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2023-02-10
+updated_on: 2024-04-22

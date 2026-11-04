@@ -1,0 +1,25 @@
+name: Crop Health & Agro Alert
+quip: Fields at a glance
+description: |
+  Computes vegetation indices for agricultural parcels and sends alerts when crop stress deviates from the regional baseline.
+
+repo_url: https://example.org/crop-alert
+website: https://example.org/crop-alert/site
+demo_url: https://example.org/crop-alert/demo
+docs_url: https://example.org/crop-alert/docs
+
+screenshot_url: images/crop-alert.svg
+
+category: Agriculture
+tags: [agriculture, vegetation, live]
+stack: [Python, R, Kubernetes, PostGIS]
+
+status: active
+featured: false
+version: 1.4.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2025-05-14
+updated_on: 2026-07-07

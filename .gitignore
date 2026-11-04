@@ -1,0 +1,6 @@
+dist/
+preview/
+__pycache__/
+*.pyc
+.venv/
+.claude/

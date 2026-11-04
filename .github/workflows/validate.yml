@@ -1,0 +1,30 @@
+name: Validate project cards
+
+# Runs on every PR so mistakes in a project card show up as annotations on the
+# changed file instead of a failed deployment after merging.
+on:
+  pull_request:
+    paths:
+      - "projects/**"
+      - "site/**"
+      - "scripts/**"
+      - "requirements.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Build site (strict)
+        run: python scripts/build.py --strict

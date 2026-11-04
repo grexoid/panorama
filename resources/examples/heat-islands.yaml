@@ -1,0 +1,25 @@
+name: Urban Heat Island Analyst
+quip: Where cities run hot
+description: |
+  Maps surface temperature anomalies in European cities and relates them to land cover and green-space access.
+
+repo_url: https://example.org/heat-islands
+website: https://example.org/heat-islands/site
+demo_url: https://example.org/heat-islands/demo
+docs_url: https://example.org/heat-islands/docs
+
+screenshot_url: images/heat-islands.svg
+
+category: Climate
+tags: [climate, urban, modelling]
+stack: [Python, Docker, PostGIS]
+
+status: active
+featured: false
+version: 1.6.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2026-03-02
+updated_on: 2026-09-18

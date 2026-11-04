@@ -1,0 +1,25 @@
+name: Coastal Erosion Tracker
+quip: Shorelines in motion
+description: |
+  Extracts shoreline positions from radar images and estimates erosion rates along European coasts.
+
+repo_url: https://example.org/coastal-erosion
+website: https://example.org/coastal-erosion/site
+
+docs_url: https://example.org/coastal-erosion/docs
+
+screenshot_url: images/coastal-erosion.svg
+
+category: Earth Observation
+tags: [coastal, radar, legacy]
+stack: [Python, GDAL]
+
+status: maintenance
+featured: false
+version: 1.5.0
+license: EUPL-1.2
+affiliation: Example Environment Agency
+contact: Jane Example <jane@example.org>
+
+released_on: 2024-09-01
+updated_on: 2026-01-15

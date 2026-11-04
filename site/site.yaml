@@ -1,0 +1,13 @@
+# Site-wide settings for the gallery. Everything is optional.
+title: AI Projects Catalog          # shown in the top bar and browser tab
+icon: "🌍"                          # emoji used as logo and favicon
+heading: Project gallery            # page heading
+tagline: Geospatial and AI use cases from our community.
+search_placeholder: Search projects, tags, technologies…
+
+# Target of the "Add project" button. Leave empty to use the repository's README
+# (derived automatically when built by GitHub Actions).
+contribute_url: ""
+
+# Optional footer line (plain text).
+footer: ""
