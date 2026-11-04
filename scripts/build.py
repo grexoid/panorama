@@ -180,14 +180,22 @@ def load_card(path: Path, projects_dir: Path, media: dict[str, Path], problems: 
     try:
         raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
-        problems.error(where, f"invalid YAML: {' '.join(str(exc).split())}")
+        # The parser's own message is technical, so add the usual causes in plain words.
+        line = getattr(getattr(exc, "problem_mark", None), "line", None)
+        near = f" (near line {line + 1})" if line is not None else ""
+        problems.error(
+            where,
+            f"the file is not valid YAML{near}. Usual causes: text containing a colon followed by a space "
+            "(put the whole text in double quotes), a Tab instead of spaces, a missing space after a colon, "
+            "or a missing closing quote. See the notes at the top of resources/templates/project-card.yaml.",
+        )
         return None
     if not isinstance(raw, dict):
-        problems.error(where, "file must contain a YAML mapping (key: value pairs)")
+        problems.error(where, "the file must consist of 'field: value' lines - compare it with resources/templates/project-card.yaml")
         return None
 
     for key in raw.keys() - KNOWN_FIELDS:
-        problems.warn(where, f"unknown field '{key}' is ignored")
+        problems.warn(where, f"unknown field '{key}' is ignored - check the spelling against the template")
     for key in REQUIRED_FIELDS:
         if not as_text(raw.get(key)):
             problems.error(where, f"missing required field '{key}'")
@@ -195,7 +203,7 @@ def load_card(path: Path, projects_dir: Path, media: dict[str, Path], problems: 
     name = as_text(raw.get("name"))
     links = {f: check_url(as_text(raw.get(f)), where, f, problems) for f in LINK_FIELDS}
     if not (links["website"] or links["repo_url"]):
-        problems.error(where, "provide at least one of 'website' or 'repo_url'")
+        problems.error(where, "provide at least one of 'website' or 'repo_url' (a full address starting with https://)")
 
     status = as_text(raw.get("status")).lower() or "active"
     if status not in STATUSES:
@@ -345,7 +353,8 @@ def main() -> int:
         print(f"\nBuild failed: {len(problems.errors)} error(s), {len(problems.warnings)} warning(s).")
         return 1
     if not cards:
-        problems.warn(str(projects_dir), "no project cards found - the gallery will be empty")
+        # Not an error: a fresh repository has no cards yet and the site shows a friendly empty state.
+        print("Note: no project cards found - the gallery will be empty.")
 
     # Fresh output folder (guard against pointing --out at something important).
     if out_dir.exists():

@@ -1,3 +1,6 @@
+# Fictional example card - not a real project. Used to preview the gallery layout.
+# To write your own card, start from resources/templates/project-card.yaml.
+
 name: Crop Health & Agro Alert
 quip: Fields at a glance
 description: |

@@ -3,15 +3,15 @@
 A static, template-driven gallery of project cards, published on GitHub Pages.
 
 - One YAML file per project - no code changes needed to add one.
-- Hover (or tab to) a card to enlarge it: bigger screenshot, full description, technologies, metadata and links to the website, repository, optional demo and docs.
+- Hover (or tab to) a card and it pops out of the page from its centre: bigger screenshot, full description, technologies, metadata and links to the website, repository, optional demo and docs.
 - Top bar with search plus **Tags** and **Technologies** filters; status filter and sorting below it. Filters are reflected in the URL, so a filtered view can be shared.
 - Works on phones (tap a card to expand it), in dark and light themes, and without any external requests (no CDN, no web fonts, no tracking).
 
 ```
-projects/                 <- project cards live here (one .yaml per project)
+projects/                 <- the real project cards live here (one .yaml per project)
   images/                 <- optional screenshots/thumbnails committed to the repo
-resources/templates/      <- project-card.yaml: the template to copy
-resources/examples/       <- fictional cards for trying out the layout
+resources/templates/      <- project-card.yaml: the commented template to copy
+resources/examples/       <- a filled-in card (eagle-eye.yaml) plus fictional ones for previewing the layout
 site/                     <- site.yaml (title, logo), Jinja2 template, CSS, JS
 scripts/build.py          <- validates the cards and renders dist/
 .github/workflows/        <- validate.yml (on PRs) and deploy.yml (on merge)
@@ -19,10 +19,22 @@ scripts/build.py          <- validates the cards and renders dist/
 
 ## Adding a project
 
-1. Copy [`resources/templates/project-card.yaml`](resources/templates/project-card.yaml) to `projects/<short-name>.yaml` and fill it in.
-2. *(Optional)* add images to `projects/images/` and reference them relatively, e.g. `screenshot_url: images/my-project.png`. Absolute `https://` URLs work too. Keep files under 1.5 MB; a 16:9 screenshot (about 1200 x 675 px) and a square thumbnail (about 128 x 128 px) look best. Without images the card shows a coloured placeholder with the project's initials.
-3. Open a pull request. The **Validate project cards** check builds the site and annotates any problem directly on your file.
+1. Copy [`resources/templates/project-card.yaml`](resources/templates/project-card.yaml) to `projects/<short-name>.yaml` and fill it in. The template explains every field in plain language, and [`resources/examples/eagle-eye.yaml`](resources/examples/eagle-eye.yaml) shows a completed card.
+2. *(Optional)* add images to `projects/images/` and reference them relatively, e.g. `screenshot_url: images/my-project.png`. Absolute `https://` URLs work too. Keep files under 1.5 MB; a landscape screenshot (about 1200 x 600 px) and a square thumbnail (about 128 x 128 px) look best. Without images the card shows a coloured placeholder with the project's initials.
+3. Open a pull request. The **Validate project cards** check builds the site and annotates any problem directly on your file, in plain words.
 4. When the PR is merged into `main`, the **Deploy gallery** workflow rebuilds the site and publishes it to GitHub Pages.
+
+### No Git experience? Use the browser
+
+You can do all of this on github.com without installing anything:
+
+1. Open the [`resources/templates/project-card.yaml`](resources/templates/project-card.yaml) file and copy its contents (the copy button is at the top right of the file view).
+2. Go to the `projects` folder, choose **Add file -> Create new file**, and name it e.g. `forest-watch.yaml`.
+3. Paste the template, replace the example text with your own, and follow the notes in the file.
+4. Click **Commit changes...**, choose **Create a new branch and start a pull request**, then **Propose changes** and **Create pull request**.
+5. Wait a minute for the **Validate project cards** check. If it shows a red cross, open the details: it names the line to fix. Edit the file in the same pull request and the check runs again.
+
+To add a picture the same way, open `projects/images`, choose **Add file -> Upload files**, and select **Commit directly to the branch** of your pull request.
 
 ### Card fields
 

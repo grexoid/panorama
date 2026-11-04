@@ -1,0 +1,42 @@
+# A completely filled-in project card that uses every available field.
+# To write your own, start from resources/templates/project-card.yaml instead.
+# (The image addresses below are placeholders, so the card shows a coloured
+# tile with the initials "EE" instead of a picture.)
+
+# --- Required: name and description ------------------------------------------
+name: EAGLE Eye
+quip: From text to barcode                      # short line under the title
+description: Converts textual descriptions into EAGLE classes with barcodes.
+
+# --- Links (at least one of website / repo_url is required) ------------------
+repo_url: https://github.com/eea/eagle-eye      # the code repository
+website: https://eagle.eea.eu                   # the project's main website
+demo_url: https://eea.github.io/eagle-eye-demo  # optional: a place to try it out
+docs_url: https://eagle.eea.eu/docs             # optional: documentation
+
+# --- Pictures (optional) -----------------------------------------------------
+screenshot_url: https://imgur.com/1346          # large picture shown on hover
+thumbnail_url: https://imgur.com/1346_thumb     # small icon on the card
+
+# --- Topic and filters -------------------------------------------------------
+category: Geospatial AI                         # broad topic area
+tags:                                           # keywords; people can filter by them
+  - modelling
+  - EAGLE
+  - land use
+stack:                                          # technologies used; also filterable
+  - Python
+  - RDF
+  - Docker
+
+# --- Status and details ------------------------------------------------------
+status: active          # one of: active | beta | maintenance | archived
+featured: true          # true = star on the card, listed first
+version: 1.0.0
+license: EUPL-1.2
+affiliation: Environment Agency Austria
+contact: Gregor Rosenauer <gregor@uba.at>       # name, then e-mail in < >
+
+# --- Dates, written year-month-day -------------------------------------------
+released_on: 2026-10-26
+updated_on: 2026-11-03

@@ -6,6 +6,8 @@ on:
   pull_request:
     paths:
       - "projects/**"
+      - "resources/templates/**"
+      - "resources/examples/**"
       - "site/**"
       - "scripts/**"
       - "requirements.txt"
@@ -28,3 +30,11 @@ jobs:
 
       - name: Build site (strict)
         run: python scripts/build.py --strict
+
+      # Keep the blank template and the example cards valid, so what people copy always works.
+      - name: Check template and examples
+        run: |
+          mkdir "$RUNNER_TEMP/template"
+          cp resources/templates/project-card.yaml "$RUNNER_TEMP/template/"
+          python scripts/build.py --strict --projects "$RUNNER_TEMP/template" --out "$RUNNER_TEMP/template-out"
+          python scripts/build.py --strict --projects resources/examples --out "$RUNNER_TEMP/examples-out"

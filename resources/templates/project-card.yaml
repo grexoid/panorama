@@ -1,36 +1,108 @@
-name: EAGLE Eye
-quip: From text to barcode
-description: Converts textual descriptions into EAGLE classes with barcodes.
+# =============================================================================
+#  PROJECT CARD
+#  Fill this in to get your project onto the gallery. No programming needed.
+# =============================================================================
+#
+#  WHAT TO DO
+#   1. Copy this file into the "projects" folder and rename it after your
+#      project, using only lowercase letters, digits and dashes - for example
+#      projects/forest-watch.yaml. The file name is not shown on the website.
+#   2. Replace the example text after each "field:" with your own.
+#   3. Lines that start with "#" are notes for you; the website ignores them.
+#      Lines marked OPTIONAL are switched off - delete the "# " at the start
+#      of a line to use it.
+#   4. Save, and submit the file (see "Adding a project" in the README).
+#      A check runs automatically and tells you if anything needs fixing.
+#
+#  THE FEW RULES OF THIS FILE FORMAT (it is called YAML)
+#   - Each line looks like   field: value   -- keep the space after the colon.
+#   - Indent with spaces only, never with the Tab key.
+#   - If your text contains a colon followed by a space (e.g. "Note: this"),
+#     or starts with a quote, #, [, {, *, & or !, put the whole text in double
+#     quotes:   quip: "Note: this works"
+#   - A list has one entry per line, each starting with "- " and indented by
+#     two spaces (see "tags" below).
+#   - Dates are written year-month-day, e.g. 2026-11-04.
+# =============================================================================
 
-# Repository & Links
-repo_url: https://github.com/eea/eagle-eye
-website: https://eagle.eea.eu
-demo_url: https://eea.github.io/eagle-eye-demo
-docs_url: https://eagle.eea.eu/docs
 
-# Visuals
-screenshot_url: https://imgur.com/1346
-thumbnail_url: https://imgur.com/1346_thumb
+# -----------------------------------------------------------------------------
+#  REQUIRED
+# -----------------------------------------------------------------------------
 
-# Taxonomie & Filter
-category: Geospatial AI
+# The project's name. Shown as the card title.
+name: My Project Name
+
+# What the project does, in a few sentences. Shown when someone hovers over
+# the card. The "|" below means "several lines follow"; keep every line
+# indented by two spaces. A blank line starts a new paragraph.
+description: |
+  Describe in two to four sentences what the project does and who it is for.
+
+  A second paragraph is fine if you need it.
+
+# Links. You need AT LEAST ONE of "website" and "repo_url".
+# Always give the full address, starting with https://
+website: https://example.org/my-project
+repo_url: https://github.com/my-organisation/my-project   # the code repository
+
+
+# -----------------------------------------------------------------------------
+#  RECOMMENDED - makes the card easy to find and pleasant to scan
+# -----------------------------------------------------------------------------
+
+# One short line under the title (about 6 words).
+quip: A short, catchy summary
+
+# Keywords that describe the topic. People can filter the gallery by them.
+# Examples: land use, satellite, biodiversity, climate. Add as many as fit.
 tags:
-  - modelling
-  - EAGLE
-  - land use
+  - first keyword
+  - second keyword
+
+# Technologies used. People can filter by these too.
+# Examples: Python, R, Docker, PyTorch, PostgreSQL
 stack:
   - Python
-  - RDF
-  - Docker
 
-# Metadaten & Status
-status: active          # active | beta | maintenance | archived
-featured: true
-version: 1.0.0
-license: EUPL-1.2
-affiliation: Environment Agency Austria
-contact: Gregor Rosenauer <gregor@uba.at>
+# A broad topic area, e.g. Earth Observation, Climate, Biodiversity.
+category: Geospatial AI
 
-# Zeitstempel (ISO 8601 für native Sortierbarkeit)
-released_on: 2026-10-26
-updated_on: 2026-11-03
+# Where the project stands. Choose exactly one of:
+#   active       - in regular use
+#   beta         - being tested, not final
+#   maintenance  - finished, only fixes and small updates
+#   archived     - no longer developed
+status: active
+
+
+# -----------------------------------------------------------------------------
+#  OPTIONAL - delete the "# " at the start of a line to use it
+# -----------------------------------------------------------------------------
+
+# More links. Each one adds a button to the card.
+# demo_url: https://example.org/my-project/demo     # a place to try it out
+# docs_url: https://example.org/my-project/docs     # documentation
+
+# Pictures. Without them the card shows a coloured tile with the project's
+# initials. Either paste a full https:// address, or add the picture file to
+# the "projects/images" folder and write its path as shown below.
+#   screenshot_url: the large picture shown on hover (landscape, about 1200 x 600 px)
+#   thumbnail_url:  the small square icon on the card (about 128 x 128 px)
+# Allowed formats: png, jpg, webp, gif, svg. Please keep each file under 1.5 MB.
+# screenshot_url: images/my-project.png
+# thumbnail_url: images/my-project-icon.png
+
+# Put "true" here to show a star on the card and list it first.
+# featured: true
+
+# Details shown at the bottom of the expanded card.
+# version: 1.0.0
+# license: EUPL-1.2
+# affiliation: Name of your organisation
+# contact: Jane Doe <jane.doe@example.org>     # name first, e-mail in < >
+
+# Dates, written year-month-day. They are used for the "Recently updated"
+# and "Newest" sorting.
+# released_on: 2026-10-26
+# updated_on: 2026-11-03

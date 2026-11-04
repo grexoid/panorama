@@ -240,17 +240,37 @@
 
   const overlayMode = matchMedia('(hover: hover) and (min-width: 760px)');
 
-  // Cards float over their neighbours on desktop. Near the bottom of the viewport open upwards.
+  // On desktop a card grows from the centre of its grid cell (see the "pop out" block in style.css).
+  // Near the window edges that could push it under the top bar or off the bottom, so work out how far
+  // to nudge it (--shift) to keep the whole card visible. If the card is taller than the window,
+  // its top stays visible.
+  const MARGIN = 16;
   const placeCell = (cell) => {
-    if (!overlayMode.matches) { cell.classList.remove('up'); return; }
-    const grown = cell.offsetHeight + $('.more-inner', cell).scrollHeight + 14;   // collapsed + details + gap
-    const r = cell.getBoundingClientRect();
-    const overflowsBelow = r.top + grown > innerHeight;
-    const fitsAbove = r.bottom - grown > 72;                                      // below the sticky top bar
-    cell.classList.toggle('up', overflowsBelow && fitsAbove);
+    if (!overlayMode.matches) { cell.style.removeProperty('--shift'); return; }
+    const grown = cell.offsetHeight + $('.more-inner', cell).scrollHeight + 14;   // collapsed height + details + gap
+    const r = cell.getBoundingClientRect();                                       // the cell itself never moves
+    const centred = r.top + r.height / 2 - grown / 2;                             // top edge if grown around the centre
+    const minTop = Math.max($('.topbar').getBoundingClientRect().bottom, 0) + MARGIN;
+    const maxTop = Math.max(innerHeight - grown - MARGIN, minTop);
+    const top = Math.min(Math.max(centred, minTop), maxTop);
+    cell.style.setProperty('--shift', `${Math.round(top - centred)}px`);
   };
   grid.addEventListener('pointerover', (e) => { const c = e.target.closest('.cell'); if (c) placeCell(c); });
   grid.addEventListener('focusin', (e) => { const c = e.target.closest('.cell'); if (c) placeCell(c); });
+
+  // Keep the raised card inside the window if the page is scrolled or resized while it is open.
+  let queued = false;
+  const refresh = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const c = grid.querySelector('.cell:hover') || document.activeElement?.closest?.('.cell');
+      if (c) placeCell(c);
+    });
+  };
+  addEventListener('scroll', refresh, { passive: true });
+  addEventListener('resize', refresh);
 
   // Touch / narrow screens: tap a card to expand it inline.
   grid.addEventListener('click', (e) => {

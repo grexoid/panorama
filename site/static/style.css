@@ -21,15 +21,16 @@
   --focus: #7dd3fc;
   --chip-bg-l: 22%;
   --chip-fg-l: 80%;
-  --shadow: 0 30px 60px -16px rgb(0 0 0 / .8), 0 0 0 1px rgb(255 255 255 / .03);
+  --shadow: 0 44px 90px -14px rgb(0 0 0 / .85), 0 14px 32px -6px rgb(0 0 0 / .5), 0 0 0 1px rgb(255 255 255 / .05);
   --bg-img-opacity: .42;
 
   --radius: 16px;
   --gap: 20px;
   --gutter: 48px;           /* must stay >= --grow so expanded cards never leave the page */
   --card-h: 172px;          /* height of a collapsed card (desktop overlay mode) */
-  --grow: 36px;           /* how far an expanded card extends on each side */
+  --grow: 32px;          /* how far an expanded card extends on each side */
   --ease: cubic-bezier(.2, .7, .2, 1);
+  --pop: cubic-bezier(.34, 1.45, .64, 1);   /* slight overshoot */
   --t: .24s;
 }
 
@@ -51,7 +52,7 @@
   --focus: #0369a1;
   --chip-bg-l: 90%;
   --chip-fg-l: 26%;
-  --shadow: 0 30px 50px -18px rgb(20 40 80 / .35), 0 0 0 1px rgb(20 40 80 / .04);
+  --shadow: 0 44px 80px -16px rgb(20 40 80 / .4), 0 14px 30px -8px rgb(20 40 80 / .22), 0 0 0 1px rgb(20 40 80 / .05);
   --bg-img-opacity: .55;
 }
 
@@ -243,8 +244,12 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: default;
-  /* z-index is held until the collapse animation finishes so a closing card stays above its neighbours */
-  transition: border-color var(--t), box-shadow var(--t), left var(--t) var(--ease), right var(--t) var(--ease), z-index 0s var(--t);
+  /* `scale` uses an overshooting curve so the card "pops"; z-index is held until the
+     collapse animation finishes so a closing card stays above its neighbours. */
+  transition:
+    border-color var(--t), box-shadow var(--t), opacity .2s,
+    left var(--t) var(--ease), right var(--t) var(--ease), translate var(--t) var(--ease),
+    scale .36s var(--pop), z-index 0s var(--t);
 }
 .card:focus-visible { outline-offset: 3px; }
 
@@ -303,9 +308,14 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   visibility: hidden;
   transition: grid-template-rows var(--t) var(--ease), visibility 0s var(--t);
 }
-.more-inner { min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+.more-inner {
+  min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px;
+  opacity: 0; translate: 0 10px;                       /* content fades/slides in once the card has started to grow */
+  transition: opacity .18s, translate .3s var(--ease);
+}
 
 .card:is(.open, :has(:focus-visible)) .more { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.card:is(.open, :has(:focus-visible)) .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
 .card:is(.open, :has(:focus-visible)) .bg { opacity: .0; }
 
 .shot { aspect-ratio: 21 / 9; flex: none; border-radius: 12px; font-size: 2.4rem; font-weight: 700; margin-top: 2px; border: 1px solid var(--border); }
@@ -348,21 +358,35 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 /* expanded look */
 .card:is(.open, :has(:focus-visible)) { border-color: var(--border-strong); box-shadow: var(--shadow); }
 
-/* Desktop: fixed grid cells; the card floats above its neighbours and grows. */
+/* Desktop: "pop out" effect.
+   Every card sits in a fixed-size grid cell. The card itself is anchored at the
+   CENTRE of that cell, so when it gets taller (details slide open) and wider
+   (left/right grow) it expands in all directions, like coming out of the screen.
+   app.js sets --shift so the enlarged card never leaves the visible window. */
 @media (hover: hover) and (min-width: 760px) {
   .cell { position: relative; height: var(--card-h); }
-  .card { position: absolute; top: 0; left: 0; right: 0; min-height: 100%; }
-  .cell.up .card { top: auto; bottom: 0; }
+  .card { position: absolute; top: 50%; left: 0; right: 0; min-height: 100%; translate: 0 -50%; }
 
-  .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); }
+  .card:hover { border-color: var(--border-strong); }
   .card:hover .quip { -webkit-line-clamp: unset; }
   .card:hover > .chips.tags { max-height: none; }
   .card:hover .bg { opacity: 0; }
   .card:hover .more { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+  .card:hover .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
 
-  .card:is(:hover, :has(:focus-visible)) { left: calc(var(--grow) * -1); right: calc(var(--grow) * -1); z-index: 20; }
+  .card:is(:hover, :has(:focus-visible)) {
+    left: calc(var(--grow) * -1);
+    right: calc(var(--grow) * -1);
+    translate: 0 calc(-50% + var(--shift, 0px));
+    scale: 1.025;                       /* the last bit of "towards the viewer" */
+    box-shadow: var(--shadow);
+    z-index: 20;
+  }
 
-  /* small hover-intent delay so sweeping the mouse across the grid doesn't pop cards open */
+  /* While one card is raised, the others recede slightly to add depth. */
+  .grid:has(.card:hover) .cell:not(:hover) .card { opacity: .45; scale: .97; }
+
+  /* Small hover-intent delay so sweeping the mouse across the grid doesn't pop cards open. */
   .card:hover { transition-delay: .09s; }
   .card:hover .more { transition-delay: .09s, 0s; }
 }
