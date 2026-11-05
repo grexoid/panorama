@@ -1,0 +1,68 @@
+# The project's name. Shown as the card title.
+name: EAGLE Eye
+
+# What the project does, in a few sentences. Shown when someone hovers over
+# the card. The "|" below means "several lines follow"; keep every line
+# indented by two spaces. A blank line starts a new paragraph.
+description: |
+  EAGLE Eye is a geospatial AI project for transforming textual descriptions about 
+  land cover, land use, and land characteristics into matching EAGLE classes, using
+  a combination of natural language processing and machine learning techniques.
+
+# Links. You need AT LEAST ONE of "website" and "repo_url".
+# Always give the full address, starting with https://
+website: https://github.com/eea/EAGLE/blob/main/eagle-eye/README.md
+repo_url: https://github.com/eea/EAGLE   # the code repository
+
+# -----------------------------------------------------------------------------
+#  RECOMMENDED - makes the card easy to find and pleasant to scan
+# -----------------------------------------------------------------------------
+
+# One short line under the title (about 6 words).
+quip: if you can describe it, the EAGLE Eye can classify it
+
+# Keywords that describe the topic. People can filter the gallery by them.
+# Examples: land use, satellite, biodiversity, climate. Add as many as fit.
+tags:
+  - land cover
+  - land use
+  - land characteristics
+  - EAGLE matrix
+  - bcv
+  - barcoding
+  - clcplus
+  - copernicus
+
+# Technologies used. People can filter by these too.
+# Examples: Python, R, Docker, PyTorch, PostgreSQL
+stack:
+  - Python
+  - streamlit
+  - web
+
+# A broad topic area, e.g. Earth Observation, Climate, Biodiversity.
+category: land-monitoring
+
+# Where the project stands. Choose exactly one of:
+#   active       - in regular use
+#   beta         - being tested, not final
+#   maintenance  - finished, only fixes and small updates
+#   archived     - no longer developed
+status: active
+
+screenshot_url: images/eagle-eye/screenshot.png
+thumbnail_url: images/eagle-eye/logo.jpg
+
+# Put "true" here to show a star on the card and list it first.
+# featured: true
+
+# Details shown at the bottom of the expanded card.
+# version: 1.0.0
+# license: EUPL-1.2
+# affiliation: Name of your organisation
+# contact: Jane Doe <jane.doe@example.org>     # name first, e-mail in < >
+
+# Dates, written year-month-day. They are used for the "Recently updated"
+# and "Newest" sorting.
+# released_on: 2026-10-26
+# updated_on: 2026-11-03
