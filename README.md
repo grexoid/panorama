@@ -1,4 +1,8 @@
-# Project gallery
+<p align="center">
+  <img src="resources/images/panorama-logo.jpg" alt="PANORAMA Logo" width="400"/>
+</p>
+
+# PANORAMA - an AI Project gallery
 
 A static, template-driven gallery of project cards, published on GitHub Pages.
 
@@ -38,22 +42,22 @@ To add a picture the same way, open `projects/images`, choose **Add file -> Uplo
 
 ### Card fields
 
-| Field | Required | Notes |
-| --- | --- | --- |
-| `name` | yes | Card title |
-| `description` | yes | Shown when the card is expanded. Blank lines start a new paragraph. |
-| `quip` | | One-line teaser shown on the collapsed card |
-| `website`, `repo_url` | at least one | Shown as **Website** and **Repository** buttons |
-| `demo_url`, `docs_url` | | Optional **Demo** and **Docs** buttons |
-| `screenshot_url`, `thumbnail_url` | | `https://...` URL or a path relative to `projects/` |
-| `category` | | Free text, shown in the details and searchable |
-| `tags` | | List; feeds the **Tags** filter. Matching is case-insensitive. |
-| `stack` | | List; feeds the **Technologies** filter |
-| `status` | | `active` (default), `beta`, `maintenance` or `archived` |
-| `featured` | | `true` shows a star and sorts the card first |
-| `version`, `license`, `affiliation` | | Shown in the details |
-| `contact` | | `Name <email>`; the name links to the email address |
-| `released_on`, `updated_on` | | ISO dates (`YYYY-MM-DD`); drive the "Recently updated" / "Newest" sorting |
+| Field                                     | Required     | Notes                                                                       |
+| ----------------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `name`                                  | yes          | Card title                                                                  |
+| `description`                           | yes          | Shown when the card is expanded. Blank lines start a new paragraph.         |
+| `quip`                                  |              | One-line teaser shown on the collapsed card                                 |
+| `website`, `repo_url`                 | at least one | Shown as **Website** and **Repository** buttons                 |
+| `demo_url`, `docs_url`                |              | Optional **Demo** and **Docs** buttons                          |
+| `screenshot_url`, `thumbnail_url`     |              | `https://...` URL or a path relative to `projects/`                     |
+| `category`                              |              | Free text, shown in the details and searchable                              |
+| `tags`                                  |              | List; feeds the **Tags** filter. Matching is case-insensitive.        |
+| `stack`                                 |              | List; feeds the **Technologies** filter                               |
+| `status`                                |              | `active` (default), `beta`, `maintenance` or `archived`             |
+| `featured`                              |              | `true` shows a star and sorts the card first                              |
+| `version`, `license`, `affiliation` |              | Shown in the details                                                        |
+| `contact`                               |              | `Name <email>`; the name links to the email address                       |
+| `released_on`, `updated_on`           |              | ISO dates (`YYYY-MM-DD`); drive the "Recently updated" / "Newest" sorting |
 
 Files whose name starts with `_` are ignored, which is handy for drafts.
 
