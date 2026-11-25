@@ -106,7 +106,7 @@ def main() -> int:
         # 3b. defaults and list-valued country count as "the same" -------------------------------------------------
         (cards / "projects" / "plain.yaml").write_text(
             "name: Plain\ndescription: text\nwebsite: https://example.org\ncountry:\n  - Italy\n  - Greece\n", encoding="utf-8")
-        for same in ({"status": "active"}, {"country": "Italy, Greece"}, {"featured": "false"}):
+        for same in ({"status": "active"}, {"country": "Italy, Greece"}, {"country": "italy,greece"}, {"featured": "false"}):
             try:
                 update_card.update("project", "plain", same, cards, today=today)
                 failures.append(f"a field that already has this value (or default) was changed: {same}")

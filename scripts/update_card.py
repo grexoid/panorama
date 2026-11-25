@@ -74,10 +74,10 @@ def normal(key: str, value) -> object:
     """A value in a form that is equal when two values mean the same (used to spot changes that are none)."""
     if value is None:
         return ""
-    if isinstance(value, list) and key not in LIST:      # e.g. a country written as a YAML list
-        return " ".join(", ".join(str(v) for v in value).split())
-    if key in LIST:
+    if key in LIST or key == "country":                  # several values: "EU,Austria", "EU, Austria" and a YAML list are the same
         return tuple(i.casefold() for i in split_list(value))
+    if isinstance(value, list):
+        return " ".join(", ".join(str(v) for v in value).split())
     if key in TEXT:
         return clean_text(value)
     if isinstance(value, bool):
