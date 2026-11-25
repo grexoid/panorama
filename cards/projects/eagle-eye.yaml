@@ -11,7 +11,7 @@ description: |
 
 # Links. You need AT LEAST ONE of "website" and "repo_url".
 # Always give the full address, starting with https://
-website: https://github.com/eea/EAGLE/blob/main/eagle-eye/README.md
+website: https://eagle-eye-v1ga.onrender.com/
 repo_url: https://github.com/eea/EAGLE   # the code repository
 
 # -----------------------------------------------------------------------------
