@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark light">
-  <title>{{ site.title }} · protected</title>
+  <title>{{ site.title }}</title>
   <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="{{ root }}static/style.css?v={{ assets.css }}">
   <script>
@@ -27,6 +27,7 @@
     <div class="gate-card">
       <p class="gate-icon" aria-hidden="true">{{ site.icon }}</p>
       <h1>{{ site.title }}</h1>
+      {% if site.title_expansion %}<p class="gate-expansion">{{ site.title_expansion|emphasis }}</p>{% endif %}
       <p class="gate-hint">This gallery is protected. Enter the password to continue.</p>
       <form id="gate-form" autocomplete="off" hidden>
         <label class="sr-only" for="gate-password">Password</label>

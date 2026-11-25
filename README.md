@@ -10,7 +10,8 @@ A static, template-driven gallery of **projects** and **use cases**, published o
   - a **project** is running or finished work and links to its own website, repository, demo and docs;
   - a **use case** is an idea - aspiring work that has not become a project yet. It gets a page of its own on the gallery site, an exposé with the full text, optional figures and the facts at a glance.
 - Hover (or tab to) a card and it pops out of the page from its centre: bigger picture, summary, technologies, metadata and links.
-- Top bar with search plus **Tags**, **Technologies** and **Area** filters. A switch shows all cards, only projects or only use cases; projects can also be filtered by status. Filters are reflected in the URL, so a filtered view can be shared.
+- Top bar with search plus **Tags**, **Technologies**, **Area** and **Country** filters. A switch shows all cards, only projects or only use cases; projects can also be filtered by status. A country (or a tag or technology) shown on a card is clickable and filters the gallery by it. Filters are reflected in the URL, so a filtered view can be shared.
+- Every card has an **Edit on GitHub** link, and cards can be updated or promoted from idea to project without editing files (see [Updating a card](#updating-a-card)).
 - Use cases are **tagged automatically** from their text.
 - Works on phones (tap a card to expand it), in dark and light themes, and without any external requests (no CDN, no web fonts, no tracking).
 
@@ -122,6 +123,7 @@ What this does **not** do - please read before relying on it:
 | `status`                            |              | `active` (default), `beta`, `maintenance` or `archived`                   |
 | `featured`                          |              | `true` shows a star and sorts the card first                              |
 | `version`, `license`, `affiliation` |              | Shown in the details                                                      |
+| `country`                           |              | One country, or several separated by commas; feeds the **Country** filter |
 | `contact`                           |              | `Name <email>`; the name links to the email address                       |
 | `released_on`, `updated_on`         |              | ISO dates (`YYYY-MM-DD`); drive the "Recently updated" / "Newest" sorting |
 
@@ -145,6 +147,36 @@ What this does **not** do - please read before relying on it:
 
 Files whose name starts with `_` are ignored, which is handy for drafts.
 
+## Updating a card
+
+Cards change: a project gets a new version, a use case gets a partner, an idea becomes a project. Every card is one file, so updating it works like adding it: through a pull request that is checked automatically. This is the same for **projects and use cases**.
+
+| I want to ...                                                      | How                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| change anything on a card (text, tags, links, pictures ...)        | Point at the card in the gallery (or open the use case's page) and click **Edit on GitHub**. Change the file and choose *Create a new branch and start a pull request*. To replace a picture, upload the new file to the card type's `images` folder. |
+| change a few one-line fields (status, version, links, country ...) | **Actions -> Update a card -> Run workflow.** Choose the kind and name of the card and fill in only what changed. A project's `updated_on` is set to today.                                                                           |
+| turn a use case into a project                                     | **Actions -> Promote use case to project -> Run workflow.** Give the use case's name, the project's website and/or repository, and the status.                                                                                          |
+| remove a card                                                      | Delete its file (and its images) in a pull request. The address of a removed use case's page stops working.                                                                                                                        |
+
+Both workflows check the result with the normal site build and push it to a **new branch** (never to `main`). The run's summary page then links to GitHub's pull-request form; the *Validate cards* check runs on that pull request, and merging it updates the site.
+
+**Promoting** moves `cards/use-cases/<name>.yaml` to `cards/projects/` together with its images. The project description is built from the use case's summary and the start of its "proposed use of AI"; the status defaults to `beta`. Projects are not tagged automatically, so the tags and technologies the use case had are written into the card. The use case's long sections (challenge, scope, conditions ...) have no place on a project card; they stay in the repository history. Please read the new card in the pull request and adjust the description. Going from project back to use case is not automated.
+
+The same tools run on a computer, for batches or when you prefer a terminal:
+
+```bash
+python scripts/update_card.py project my-project status=active version=1.2.0
+python scripts/update_card.py use-case my-idea country=Italy
+python scripts/promote_card.py my-idea --website https://example.org/my-idea --status beta
+```
+
+Notes:
+
+- *Edit on GitHub* links need to know the repository: GitHub Actions provides it; for a local preview set `repository: owner/name` in [`site/site.yaml`](site/site.yaml).
+- The workflows ask for write access to the repository's contents in their own definition. If your organisation forbids that for Actions, they fail with a permissions message and the command-line tools are the fallback.
+- To update a use case that arrived as a *new version of a Word document*, edit the card rather than importing again: `import_use_case.py --force` would overwrite the hand-written `quip`, `summary`, organisation and country.
+- Renaming a card means renaming its file; the address of a use case's page changes with it.
+
 ## Running locally
 
 ```bash
@@ -164,7 +196,7 @@ python -m http.server -d preview 8000
 
 ## Site settings
 
-Title, logo emoji (also used as favicon), heading, tagline and search placeholder are in [`site/site.yaml`](site/site.yaml). The look is plain CSS in `site/static/style.css`; the page structure is in `site/templates/` (`index.html.j2` for the gallery, `use-case.html.j2` for a use case's page).
+Title (also the browser tab title) and the tooltip that spells it out, logo emoji (also used as favicon), heading, tagline, search placeholder and the GitHub repository are in [`site/site.yaml`](site/site.yaml). The look is plain CSS in `site/static/style.css`; the page structure is in `site/templates/` (`index.html.j2` for the gallery, `use-case.html.j2` for a use case's page).
 
 ## One-time repository setup
 

@@ -43,6 +43,7 @@
     tags: split(el.dataset.tags),
     stack: split(el.dataset.stack),
     area: split(el.dataset.area),
+    country: split(el.dataset.country),
   }));
 
   const ui = {
@@ -62,8 +63,9 @@
     tags: { param: 'tag', label: 'Tag' },
     stack: { param: 'tech', label: 'Tech' },
     area: { param: 'area', label: 'Area' },
+    country: { param: 'country', label: 'Country' },
   };
-  const labels = { tags: new Map(), stack: new Map(), area: new Map() };
+  const labels = { tags: new Map(), stack: new Map(), area: new Map(), country: new Map() };
   for (const menu of ui.menus) {
     for (const opt of $$('.opt', menu)) {
       labels[menu.dataset.facet].set($('input', opt).value, $('.opt-label', opt).textContent);
@@ -77,7 +79,7 @@
   };
   const typeFromParam = (v) => Object.keys(TYPES).find((t) => TYPES[t].param === v || t === v) || 'all';
 
-  const state = { q: '', type: 'all', status: 'all', tags: new Set(), stack: new Set(), area: new Set(), sort: 'featured' };
+  const state = { q: '', type: 'all', status: 'all', tags: new Set(), stack: new Set(), area: new Set(), country: new Set(), sort: 'featured' };
 
   /* ------------------------------------------------------------ filtering */
 
@@ -104,7 +106,7 @@
     name: (a, b) => a.name.localeCompare(b.name),
   };
 
-  const facetsActive = () => state.tags.size || state.stack.size || state.area.size;
+  const facetsActive = () => state.tags.size || state.stack.size || state.area.size || state.country.size;
   const filtersActive = () => state.q || state.status !== 'all' || facetsActive();
 
   function render() {
@@ -206,6 +208,7 @@
     state.tags.clear();
     state.stack.clear();
     state.area.clear();
+    state.country.clear();
     render();
   }
 

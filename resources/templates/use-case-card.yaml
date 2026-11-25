@@ -117,7 +117,7 @@ conditions: |
 
 # Who is behind the idea, and where.
 # affiliation: Name of your organisation
-# country: Austria
+# country: Austria          # visitors can filter by it; several: Austria, Italy
 # contact: Jane Doe <jane.doe@example.org>     # name first, e-mail in < >
 
 # Pictures for your page, e.g. an architecture diagram or a mock-up. Add the picture

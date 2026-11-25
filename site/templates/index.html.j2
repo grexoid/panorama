@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import icon, visual %}
+{% from "_macros.html.j2" import icon, visual, brand %}
 
 {# Dropdown with checkboxes. `facet` ties it to the filter logic in app.js. #}
 {% macro facet_menu(id, label, items, hidden=false) %}
@@ -28,13 +28,15 @@
   </details>
 {% endmacro %}
 
+{# A card's countries as small buttons; clicking one filters the gallery by that country. #}
+{% macro country_chips(card) %}
+<dd class="chip-row">{% for c in card.countries %}<button type="button" class="chip plain mini" data-facet="country" data-key="{{ c.key }}" title="Show everything from {{ c.label }}">{{ c.label }}</button>{% endfor %}</dd>
+{% endmacro %}
+
 {% block topbar %}
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="./" aria-label="{{ site.title }} - home">
-      <span class="brand-icon" aria-hidden="true">{{ site.icon }}</span>
-      <span class="brand-name">{{ site.title }}</span>
-    </a>
+    {{ brand(site, './') }}
 
     <div class="filters" role="search">
       <label class="search">
@@ -45,6 +47,7 @@
       {{ facet_menu('tags', 'Tags', facets.tags) }}
       {{ facet_menu('stack', 'Technologies', facets.stack) }}
       {% if facets.areas %}{{ facet_menu('area', 'Area', facets.areas) }}{% endif %}
+      {% if facets.countries %}{{ facet_menu('country', 'Country', facets.countries) }}{% endif %}
       <label class="control select">
         <span class="sr-only">Sort by</span>
         <select id="sort">
@@ -108,6 +111,7 @@
         data-tags="{{ card.tags|map(attribute='key')|join('|') }}"
         data-stack="{{ card.stack|map(attribute='key')|join('|') }}"
         data-area="{{ card.area_key if is_uc else '' }}"
+        data-country="{{ card.countries|map(attribute='key')|join('|') }}"
         data-status="{{ card.status }}"
         data-featured="{{ 1 if card.featured else 0 }}"
         data-updated="{{ card.updated.isoformat() if card.updated else '' }}"
@@ -172,16 +176,18 @@
               {% if is_uc %}
               <div><dt>Area</dt><dd>{{ card.area_label }}</dd></div>
               {% if card.affiliation %}<div><dt>By</dt><dd>{{ card.affiliation }}</dd></div>{% endif %}
-              {% if card.country %}<div><dt>Country</dt><dd>{{ card.country }}</dd></div>{% endif %}
+              {% if card.countries %}<div><dt>Country</dt>{{ country_chips(card) }}</div>{% endif %}
               {% else %}
               {% if card.category %}<div><dt>Category</dt><dd>{{ card.category }}</dd></div>{% endif %}
               {% if card.version %}<div><dt>Version</dt><dd>{{ card.version }}</dd></div>{% endif %}
               {% if card.license %}<div><dt>License</dt><dd>{{ card.license }}</dd></div>{% endif %}
               {% if card.affiliation %}<div><dt>By</dt><dd>{{ card.affiliation }}</dd></div>{% endif %}
+              {% if card.countries %}<div><dt>Country</dt>{{ country_chips(card) }}</div>{% endif %}
               {% if card.updated %}<div><dt>Updated</dt><dd><time datetime="{{ card.updated.isoformat() }}">{{ card.updated_text }}</time></dd></div>{% endif %}
               {% if card.released and card.released != card.updated %}<div><dt>Released</dt><dd><time datetime="{{ card.released.isoformat() }}">{{ card.released_text }}</time></dd></div>{% endif %}
               {% if card.contact_name %}<div><dt>Contact</dt><dd>{% if card.contact_email %}<a href="mailto:{{ card.contact_email }}">{{ card.contact_name }}</a>{% else %}{{ card.contact_name }}{% endif %}</dd></div>{% endif %}
               {% endif %}
+              {% if card.edit_url %}<div><dt>Card</dt><dd><a class="edit-link" href="{{ card.edit_url }}" target="_blank" rel="noopener" title="Opens the card's file in GitHub's editor; changes go through a pull request">{{ icon('edit') }}Edit on GitHub</a></dd></div>{% endif %}
             </dl>
 
             <nav class="links" aria-label="Links for {{ card.name }}">

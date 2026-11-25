@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import icon, rich %}
+{% from "_macros.html.j2" import icon, rich, brand %}
 
 {% block title %}{{ card.name }} · {{ site.title }}{% endblock %}
 
@@ -15,10 +15,7 @@
 {% block topbar %}
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="{{ root }}" aria-label="{{ site.title }} - home">
-      <span class="brand-icon" aria-hidden="true">{{ site.icon }}</span>
-      <span class="brand-name">{{ site.title }}</span>
-    </a>
+    {{ brand(site, root) }}
     <a class="back" href="{{ root }}?type=use-cases">{{ icon('arrow-left') }}<span>All use cases</span></a>
     <div class="actions">
       {% if site.contribute_url %}
@@ -43,7 +40,7 @@
       <ul class="x-meta">
         <li class="x-area a-{{ card.area_key }}">{{ card.area_label }}</li>
         {% if card.affiliation %}<li>{{ icon('building') }}{{ card.affiliation }}</li>{% endif %}
-        {% if card.country %}<li>{{ icon('pin') }}{{ card.country }}</li>{% endif %}
+        {% if card.countries %}<li>{{ icon('pin') }}{% for c in card.countries %}<a href="{{ root }}?country={{ c.key|urlencode }}" title="Show everything from {{ c.label }}">{{ c.label }}</a>{{ ', ' if not loop.last }}{% endfor %}</li>{% endif %}
       </ul>
 
       {% if card.tags %}
@@ -104,7 +101,7 @@
           <div><dt>Type</dt><dd>Use case · idea</dd></div>
           <div><dt>Main area</dt><dd>{{ card.area_label }}</dd></div>
           {% if card.affiliation %}<div><dt>Organisation</dt><dd>{{ card.affiliation }}</dd></div>{% endif %}
-          {% if card.country %}<div><dt>Country</dt><dd>{{ card.country }}</dd></div>{% endif %}
+          {% if card.countries %}<div><dt>Country</dt><dd>{% for c in card.countries %}<a href="{{ root }}?country={{ c.key|urlencode }}" title="Show everything from {{ c.label }}">{{ c.label }}</a>{{ ', ' if not loop.last }}{% endfor %}</dd></div>{% endif %}
           {% if card.updated %}<div><dt>Submitted</dt><dd><time datetime="{{ card.updated.isoformat() }}">{{ card.updated_text }}</time></dd></div>{% endif %}
           {% if card.contact_name %}<div><dt>Contact</dt><dd>{% if card.contact_email %}<a href="mailto:{{ card.contact_email }}">{{ card.contact_name }}</a>{% else %}{{ card.contact_name }}{% endif %}</dd></div>{% endif %}
         </dl>
@@ -117,6 +114,17 @@
         </ul>
         {% endif %}
       </div>
+
+      {% if card.edit_url %}
+      <div class="x-panel x-update">
+        <h2>Update this card</h2>
+        <ul class="x-actions">
+          <li><a href="{{ card.edit_url }}" target="_blank" rel="noopener">{{ icon('edit') }}Edit on GitHub</a></li>
+          <li><a href="{{ site.repo_url }}/actions/workflows/promote-card.yml" target="_blank" rel="noopener">{{ icon('rocket') }}Turn it into a project</a></li>
+        </ul>
+        <p>Changes go through a pull request and are checked automatically.</p>
+      </div>
+      {% endif %}
 
       <nav class="x-panel x-toc" aria-label="On this page">
         <h2>On this page</h2>

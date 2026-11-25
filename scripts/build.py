@@ -79,7 +79,7 @@ IMAGE_FIELDS = ("screenshot_url", "thumbnail_url")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif", ".svg"}
 MAX_IMAGE_BYTES = 1_500_000
 
-COMMON_FIELDS = {"name", "quip", "tags", "stack", "affiliation", "contact", "featured", *IMAGE_FIELDS}
+COMMON_FIELDS = {"name", "quip", "tags", "stack", "affiliation", "country", "contact", "featured", *IMAGE_FIELDS}
 PROJECT_FIELDS = COMMON_FIELDS | {
     "description", "category", "status", "version", "license", "released_on", "updated_on", *LINK_FIELDS,
 }
@@ -331,6 +331,7 @@ def common_part(raw: dict, where: str, folder: str, folder_dir: Path, media, pro
         "contact_email": contact_email,
         "tag_labels": as_list(raw.get("tags"), where, "tags", problems),
         "stack_labels": as_list(raw.get("stack"), where, "stack", problems),
+        "country_labels": as_list(raw.get("country"), where, "country", problems),   # one, a comma list or a YAML list
         "screenshot": resolve_image(raw.get("screenshot_url"), where, "screenshot_url", folder, folder_dir, media, problems),
         "thumbnail": resolve_image(raw.get("thumbnail_url"), where, "thumbnail_url", folder, folder_dir, media, problems),
         "hue": stable_int(name) % 360,
@@ -433,7 +434,6 @@ def use_case_part(raw: dict, where: str, folder: str, folder_dir: Path, media, p
         "area_key": area[0] if area else "",
         "area_label": area[1] if area else "",
         "area_short": area[2] if area else "",
-        "country": as_text(raw.get("country")),
         "summary": summary,
         "sections": [{"title": t, "field": f, "blocks": b} for t, f, b in ordered],
         "images": images,
@@ -444,7 +444,7 @@ def use_case_part(raw: dict, where: str, folder: str, folder_dir: Path, media, p
         "released": submitted,
         "updated": submitted,
         "body_text": body_text,
-        "search_extra": body_text + " " + as_text(raw.get("country")),
+        "search_extra": body_text,
     }
 
 
@@ -560,8 +560,10 @@ def finish_cards(cards: list[dict]) -> None:
         card["released_text"] = fmt_date(card["released"]) if card["released"] else ""
         card["tags"] = [facet_item(t, True) for t in [*card["tag_labels"], *card["auto_tags"]]]
         card["stack"] = [facet_item(t) for t in [*card["stack_labels"], *card["auto_stack"]]]
+        card["countries"] = [facet_item(c) for c in card["country_labels"]]
+        card["country"] = ", ".join(card["country_labels"])
         card["search"] = " ".join(
-            [card["name"], card["quip"], card["type_label"], card["affiliation"], card.get("area_label", ""),
+            [card["name"], card["quip"], card["type_label"], card["affiliation"], card["country"], card.get("area_label", ""),
              card["status_label"], card["search_extra"], *[t["label"] for t in card["tags"]], *[t["label"] for t in card["stack"]]]
         ).casefold()
     cards.sort(key=lambda c: (not c["featured"], -(c["updated"] or dt.date.min).toordinal(), c["type"] != "project", c["name"].casefold()))
@@ -599,18 +601,33 @@ def related_use_cases(card: dict, use_cases: list[dict], limit: int = 3) -> list
 def load_site_config(path: Path) -> dict:
     config = {
         "title": "Project Gallery",
+        "title_expansion": "",
         "heading": "Projects",
         "tagline": "",
         "icon": "🗂️",
         "search_placeholder": "Search projects, tags, technologies…",
+        "repository": "",
+        "branch": "main",
         "contribute_url": "",
         "footer": "",
     }
     if path.is_file():
         config.update({k: v for k, v in (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).items() if v is not None})
-    if not config["contribute_url"] and os.environ.get("GITHUB_REPOSITORY"):
-        config["contribute_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}#adding-a-card"
+    # The repository ("owner/name") drives the "Edit on GitHub" links; GitHub Actions provides it automatically.
+    config["repository"] = str(config["repository"] or os.environ.get("GITHUB_REPOSITORY", "")).strip().strip("/")
+    config["repo_url"] = f"https://github.com/{config['repository']}" if config["repository"] else ""
+    if config["repo_url"] and not config["contribute_url"]:
+        config["contribute_url"] = f"{config['repo_url']}#adding-a-card"
     return config
+
+
+def emphasis(text: str) -> Markup:
+    """HTML-escape `text` and turn **double-asterisk** parts into bold (used for the title's backronym)."""
+    return Markup(re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", str(escape(text))))
+
+
+def unbold(text: str) -> str:
+    return re.sub(r"\*\*(.+?)\*\*", r"\1", str(text))
 
 
 def clean_dir(folder: Path) -> None:
@@ -631,6 +648,7 @@ def public_record(card: dict) -> dict:
         "type": card["type"], "slug": card["slug"], "name": card["name"], "quip": card["quip"],
         "tags": [t["label"] for t in card["tags"]], "technologies": [t["label"] for t in card["stack"]],
         "status": card["status"], "featured": card["featured"], "affiliation": card["affiliation"],
+        "countries": [c["label"] for c in card["countries"]],
         "released_on": card["released"].isoformat() if card["released"] else None,
         "updated_on": card["updated"].isoformat() if card["updated"] else None,
         "screenshot": card["screenshot"], "thumbnail": card["thumbnail"],
@@ -642,7 +660,7 @@ def public_record(card: dict) -> dict:
         })
     else:
         record.update({
-            "page": card["page"], "main_area": card["area_label"], "country": card["country"], "summary": card["summary"],
+            "page": card["page"], "main_area": card["area_label"], "summary": card["summary"],
             "images": card["images"], "auto_tags": card["auto_tags"], "auto_technologies": card["auto_stack"],
             "sections": {s["field"]: blocks_text(s["blocks"]) for s in card["sections"]},
         })
@@ -761,6 +779,10 @@ def main() -> int:
     (out_dir / ".nojekyll").write_text("", encoding="utf-8")
 
     site = load_site_config(site_dir / "site.yaml")
+    folder_of = {ctype: folder for folder, ctype in CARD_FOLDERS.items()}
+    for card in cards:   # link to GitHub's editor for the card's file (empty when the repository is unknown)
+        card["edit_url"] = (f"{site['repo_url']}/edit/{site['branch']}/cards/{folder_of[card['type']]}/{card['slug']}.yaml"
+                            if site["repo_url"] else "")
     favicon = (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
         f'<text x="50" y="52" font-size="82" text-anchor="middle" dominant-baseline="central">{html.escape(str(site["icon"]))}</text></svg>'
@@ -776,6 +798,8 @@ def main() -> int:
     )
     env.filters["linkify"] = linkify
     env.filters["asset"] = asset_url
+    env.filters["emphasis"] = emphasis
+    env.filters["unbold"] = unbold
 
     projects = [c for c in cards if c["type"] == "project"]
     statuses_present = [s for s in STATUSES if any(c["status"] == s for c in projects)]
@@ -796,7 +820,8 @@ def main() -> int:
 
     publish(out_dir / "index.html", env.get_template("index.html.j2").render(
         **common, root="", cards=cards,
-        facets={"tags": build_facets(cards, "tags"), "stack": build_facets(cards, "stack"), "areas": build_area_facet(cards)},
+        facets={"tags": build_facets(cards, "tags"), "stack": build_facets(cards, "stack"),
+                "countries": build_facets(cards, "countries"), "areas": build_area_facet(cards)},
         statuses=[(s, STATUSES[s]) for s in statuses_present],
     ), "")
 

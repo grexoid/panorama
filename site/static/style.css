@@ -104,7 +104,27 @@ svg.fill { fill: currentColor; stroke: none; }
 }
 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--accent); font-weight: 700; font-size: 1.35rem; letter-spacing: -.01em; white-space: nowrap; }
+.brand { position: relative; }
 .brand-icon { font-size: 1.5rem; line-height: 1; }
+.brand-name { letter-spacing: .05em; }
+
+/* Tooltip that spells out the site name; appears when the brand is hovered or keyboard-focused. */
+.tip {
+  position: absolute; z-index: 70; top: calc(100% + 10px); left: 0;
+  width: max-content; max-width: calc(100vw - 2 * var(--gutter));
+  padding: 9px 14px; border-radius: 12px;
+  background: var(--surface-3); border: 1px solid var(--border-strong); box-shadow: var(--shadow);
+  color: var(--text); font-size: .88rem; font-weight: 500; letter-spacing: 0; line-height: 1.4;
+  white-space: nowrap;                                   /* one line, so the backronym reads as a phrase */
+  opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none;
+  transition: opacity .15s, transform .15s, visibility 0s .15s;
+}
+.tip b { color: var(--accent); font-weight: 800; }
+@media (max-width: 640px) { .tip { white-space: normal; } }   /* on phones it has to wrap to stay on screen */
+.brand:hover .tip, .brand:focus-visible .tip {
+  opacity: 1; visibility: visible; transform: none;
+  transition-delay: .25s;                       /* not while the pointer is just passing by */
+}
 
 .filters { flex: 1 1 520px; display: flex; align-items: center; gap: 10px; min-width: 0; }
 
@@ -302,6 +322,11 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 .chip.on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; font-weight: 600; }
 .chip.plain { --h: 215; background: var(--surface-2); color: var(--text); border-color: var(--border); }
 .chip.plain:hover { border-color: var(--border-strong); }
+.chip.mini { height: 22px; padding: 0 9px; font-size: .78rem; line-height: 20px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
+.x-meta a, .x-facts dd a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
+.x-meta a:hover, .x-facts dd a:hover { color: var(--accent); border-bottom-style: solid; }
+.filters { flex-wrap: wrap; }
 
 /* expandable details ------------------------------------------------------ */
 .more {
@@ -442,6 +467,8 @@ code { padding: 1px 6px; border-radius: 6px; background: var(--surface-2); font-
 }
 .gate-icon { margin: 0 0 8px; font-size: 2.8rem; line-height: 1; }
 .gate-card h1 { font-size: 1.4rem; letter-spacing: -.01em; color: var(--accent); }
+.gate-expansion { margin: 6px 0 0; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+.gate-expansion b { color: var(--accent); font-weight: 800; }
 .gate-hint, .gate-status { margin: 10px 0 24px; color: var(--muted); font-size: .95rem; }
 #gate-form { display: grid; gap: 12px; }
 #gate-form input {
@@ -548,6 +575,12 @@ code { padding: 1px 6px; border-radius: 6px; background: var(--surface-2); font-
 .x-facts { display: grid; gap: 12px; }
 .x-facts dt { color: var(--muted); font-size: .76rem; }
 .x-facts dd { font-size: .92rem; overflow-wrap: anywhere; }
+.edit-link { display: inline-flex; align-items: center; gap: 5px; }
+.x-actions { display: grid; gap: 2px; margin: 0 0 10px; padding: 0; list-style: none; }
+.x-actions a { display: flex; align-items: center; gap: 10px; padding: 7px 10px; margin: 0 -10px; border-radius: 8px; color: var(--text); font-size: .9rem; text-decoration: none; }
+.x-actions a:hover { background: var(--surface-2); }
+.x-actions svg { color: var(--muted); }
+.x-update p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
 .x-toc ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
 .x-toc a { display: block; padding: 6px 10px; margin: 0 -10px; border-radius: 8px; color: var(--text); font-size: .9rem; text-decoration: none; }
 .x-toc a:hover { background: var(--surface-2); }
