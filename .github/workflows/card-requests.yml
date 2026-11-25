@@ -1,10 +1,11 @@
 name: Card requests
 
-# The Update and Promote buttons on the cards open a GitHub issue form that is already filled in with the card's content
-# (the forms are defined in scripts/card_forms.py and generated into .github/ISSUE_TEMPLATE/).
-# Submitting such a form starts this workflow. It applies the request to a copy of the repository, checks that the site
+# The Update and Promote buttons on the cards open a new GitHub issue whose text is already filled in with the card's
+# content: one heading per field, the current value below it (see scripts/card_forms.py). The person edits the text and
+# presses Create, which starts this workflow. It applies the request to a copy of the repository, checks that the site
 # still builds, pushes the result to a new branch and replies on the issue with a link that opens the pull request - so a
 # person looks at the change, and the "Validate cards" check runs on it, before anything is merged.
+# (GitHub's structured issue *forms* are not used: they lock pre-filled boxes, so nothing could be edited.)
 on:
   issues:
     types: [opened]

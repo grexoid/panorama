@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply a card request: an issue that was created from one of the card forms (see scripts/card_forms.py).
+"""Apply a card request: an issue that was opened by the Update or Promote button of a card (see scripts/card_forms.py).
 
     python scripts/card_request.py --title "Update project: eagle-eye" --body-file issue.md
 
@@ -33,9 +33,15 @@ def apply_request(title: str, body: str, cards_root: Path) -> str:
     if form is None:
         raise RequestError("The title of this issue does not start with one of: " + ", ".join(f"`{f.title_prefix.strip()}`" for f in card_forms.FORMS.values()))
     values = card_forms.parse_issue_body(form, body)
-    slug = values["card"].strip().strip("`")
+    for field in form.fields:                         # a typed choice must be one of the options
+        if field.kind == "choice":
+            try:
+                values[field.id] = card_forms.parse_choice(field, values[field.id])
+            except ValueError as exc:
+                raise RequestError(str(exc)) from exc
+    slug = values["card"].strip().strip("`") or title[len(form.title_prefix):].strip()
     if not slug:
-        raise RequestError("The box *Card (file name)* is empty.")
+        raise RequestError("There is no card name: neither under the heading *Card (file name)* nor in the title.")
 
     try:
         if form.action == "update":
@@ -48,9 +54,10 @@ def apply_request(title: str, body: str, cards_root: Path) -> str:
             done = update_card.update(form.kind, slug, changes, cards_root)
             return f"Updated the {form.kind} `{slug}`:\n\n" + "\n".join(f"- {line}" for line in done)
 
-        links = {field: values[field].strip() for field in ("website", "repo_url", "demo_url", "docs_url")}
-        overrides = {field: values[field] for field in ("name", "quip", "description", "tags", "stack", "country", "affiliation", "contact")}
-        target, notes = promote_card.promote(slug, cards_root, links, values["status"].strip() or "beta", overrides=overrides)
+        given = {f.id: ("" if values[f.id].strip() == card_forms.REMOVE else values[f.id]) for f in form.fields}   # a dash = not given
+        links = {field: given[field].strip() for field in ("website", "repo_url", "demo_url", "docs_url")}
+        overrides = {field: given[field] for field in ("name", "quip", "description", "tags", "stack", "country", "affiliation", "contact")}
+        target, notes = promote_card.promote(slug, cards_root, links, given["status"].strip() or "beta", overrides=overrides)
         return f"Promoted the use case `{slug}` to a project (`{target.relative_to(cards_root.parent).as_posix()}`):\n\n" + "\n".join(f"- {n}" for n in notes)
     except (update_card.UpdateError, promote_card.PromoteError) as exc:
         raise RequestError(str(exc)) from exc

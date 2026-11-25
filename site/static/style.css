@@ -29,9 +29,8 @@
   --gutter: 48px;           /* must stay >= --grow so expanded cards never leave the page */
   --card-h: 188px;         /* height of a collapsed card (desktop overlay mode) */
   --grow: 32px;          /* how far an expanded card extends on each side */
-  --ease: cubic-bezier(.2, .7, .2, 1);
-  --pop: cubic-bezier(.34, 1.45, .64, 1);   /* slight overshoot */
-  --t: .24s;
+  --ease: cubic-bezier(.4, 0, .2, 1);       /* gentle start and end, no overshoot: used by the whole pop-out */
+  --t: .38s;
 }
 
 :root[data-theme="light"] {
@@ -264,12 +263,13 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: default;
-  /* `scale` uses an overshooting curve so the card "pops"; z-index is held until the
-     collapse animation finishes so a closing card stays above its neighbours. */
+  /* One duration and one curve for everything that moves, so the card grows as a single motion (nothing overshoots,
+     nothing starts earlier than the rest). z-index is held until the collapse has finished so a closing card
+     stays above its neighbours. */
   transition:
-    border-color var(--t), box-shadow var(--t), opacity .2s,
+    border-color var(--t) var(--ease), box-shadow var(--t) var(--ease), opacity var(--t) var(--ease),
     left var(--t) var(--ease), right var(--t) var(--ease), translate var(--t) var(--ease),
-    scale .36s var(--pop), z-index 0s var(--t);
+    scale var(--t) var(--ease), padding-inline var(--t) var(--ease), z-index 0s var(--t);
 }
 .card:focus-visible { outline-offset: 3px; }
 
@@ -289,8 +289,7 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   font-size: 1.08rem; line-height: 1.25; font-weight: 650; letter-spacing: -.01em;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.quip { margin-top: 2px; color: var(--muted); font-size: .9rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.card:is(:hover, .open, :has(:focus-visible)) .quip { -webkit-line-clamp: unset; }
+.quip { margin-top: 2px; color: var(--muted); font-size: .9rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }   /* same clamp collapsed and expanded: no jump */
 
 .badges { display: flex; gap: 6px; }
 .star { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: color-mix(in srgb, #fbbf24 18%, var(--surface)); color: #f5b301; }
@@ -307,8 +306,8 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 /* Labels: one row while collapsed, pinned to the bottom edge of the card (auto margin eats the free space). */
-.card > .chips.tags { max-height: 28px; overflow: hidden; margin-top: auto; }
-.card:is(:hover, .open, :has(:focus-visible)) > .chips.tags { max-height: none; }
+.card > .chips.tags { max-height: 28px; overflow: hidden; margin-top: auto; transition: max-height var(--t) var(--ease); }
+.card:is(:hover, .open, :has(:focus-visible)) > .chips.tags { max-height: 9rem; }
 
 .chip {
   display: inline-block; max-width: 100%; height: 28px; padding: 0 11px;
@@ -333,16 +332,16 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   display: grid; grid-template-rows: 0fr;
   visibility: hidden;
   margin-top: -12px;      /* cancels the card's flex gap while collapsed, so the labels sit flush at the bottom */
-  transition: grid-template-rows var(--t) var(--ease), visibility 0s var(--t), margin-top var(--t) var(--ease);
+  transition: grid-template-rows var(--t) var(--ease), visibility 0s var(--t), margin-top var(--t) var(--ease), margin-inline var(--t) var(--ease);
 }
 .more-inner {
   min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px;
-  opacity: 0; translate: 0 10px;                       /* content fades/slides in once the card has started to grow */
-  transition: opacity .18s, translate .3s var(--ease);
+  opacity: 0;                                          /* fades in once the card has started to grow, so the text is not seen re-wrapping */
+  transition: opacity .22s var(--ease);
 }
 
 .card:is(.open, :has(:focus-visible)) .more { grid-template-rows: 1fr; visibility: visible; margin-top: 0; transition-delay: 0s; }
-.card:is(.open, :has(:focus-visible)) .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
+.card:is(.open, :has(:focus-visible)) .more-inner { opacity: 1; transition-delay: .14s; }
 .card:is(.open, :has(:focus-visible)) .bg { opacity: .0; }
 
 .shot { aspect-ratio: 21 / 9; flex: none; border-radius: 12px; font-size: 2.4rem; font-weight: 700; margin-top: 2px; border: 1px solid var(--border); }
@@ -395,27 +394,29 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   .card { position: absolute; top: 50%; left: 0; right: 0; min-height: 100%; translate: 0 -50%; }
 
   .card:hover { border-color: var(--border-strong); }
-  .card:hover .quip { -webkit-line-clamp: unset; }
-  .card:hover > .chips.tags { max-height: none; }
+  .card:hover > .chips.tags { max-height: 9rem; }
   .card:hover .bg { opacity: 0; }
   .card:hover .more { grid-template-rows: 1fr; visibility: visible; margin-top: 0; transition-delay: 0s; }
-  .card:hover .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
+  .card:hover .more-inner { opacity: 1; transition-delay: .22s; }
 
   .card:is(:hover, :has(:focus-visible)) {
     left: calc(var(--grow) * -1);
     right: calc(var(--grow) * -1);
     translate: 0 calc(-50% + var(--shift, 0px));
-    scale: 1.025;                       /* the last bit of "towards the viewer" */
+    padding-inline: calc(16px + var(--grow));   /* grows exactly as much as the card: the header text keeps its width and never re-wraps */
+    scale: 1.012;                       /* a subtle lift towards the viewer */
     box-shadow: var(--shadow);
     z-index: 20;
   }
 
   /* While one card is raised, the others recede slightly to add depth. */
-  .grid:has(.card:hover) .cell:not(:hover) .card { opacity: .45; scale: .97; }
+  .grid:has(.card:hover) .cell:not(:hover) .card { opacity: .5; }
 
   /* Small hover-intent delay so sweeping the mouse across the grid doesn't pop cards open. */
-  .card:hover { transition-delay: .09s; }
-  .card:hover .more { transition-delay: .09s, 0s; }
+  .card:hover { transition-delay: .08s; }
+  .card:hover .more { transition-delay: .08s, 0s, .08s, .08s; }
+  .card:is(:hover, :has(:focus-visible)) .more { margin-inline: calc(var(--grow) * -1); }   /* the details use the full width */
+  .card:hover > .chips.tags { transition-delay: .08s; }
 }
 
 /* ---------------------------------------------------------------- empty / footer */
