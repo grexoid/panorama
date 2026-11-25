@@ -48,6 +48,11 @@ jobs:
           python scripts/build.py --strict --require-password --out "$RUNNER_TEMP/protected"
           python scripts/check_protected.py "$RUNNER_TEMP/protected"
 
-      # The Word importer must keep working (the test builds its own tiny Word document).
+      # The tools that change cards must keep working (each test builds its own sample cards).
       - name: Check the Word importer
         run: python scripts/check_importer.py
+
+      - name: Check the card update and promote tools
+        run: |
+          python scripts/check_update.py
+          python scripts/check_promote.py

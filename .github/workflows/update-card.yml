@@ -1,0 +1,120 @@
+name: Update a card
+
+# Quick changes to an existing project or use case without touching a file: Actions tab -> "Update a card" ->
+# Run workflow -> fill in what changed. Leave a field empty to keep it as it is. The change is checked with the
+# normal site build and pushed to a new branch; the run summary links to GitHub's pull-request form.
+#
+# For anything longer (description, the sections of a use case, tags ...) use the "Edit on GitHub" link on the card.
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "What kind of card is it?"
+        required: true
+        type: choice
+        options: [project, use-case]
+      card:
+        description: "Name of the card: its file name without .yaml"
+        required: true
+        type: string
+      status:
+        description: "Project status (projects only)"
+        required: false
+        type: choice
+        default: "(keep)"
+        options: ["(keep)", beta, active, maintenance, archived]
+      version:
+        description: "Version, e.g. 1.2.0 (projects only)"
+        required: false
+        type: string
+      website:
+        description: "Website (https://...) (projects only)"
+        required: false
+        type: string
+      repo_url:
+        description: "Code repository (https://...) (projects only)"
+        required: false
+        type: string
+      demo_url:
+        description: "Demo address (https://...) (projects only)"
+        required: false
+        type: string
+      docs_url:
+        description: "Documentation address (https://...) (projects only)"
+        required: false
+        type: string
+      country:
+        description: "Country (several: separate with commas)"
+        required: false
+        type: string
+      affiliation:
+        description: "Organisation"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    # Form values are passed as environment variables, never pasted into the shell commands.
+    env:
+      KIND: ${{ inputs.kind }}
+      CARD: ${{ inputs.card }}
+      STATUS: ${{ inputs.status }}
+      VERSION: ${{ inputs.version }}
+      WEBSITE: ${{ inputs.website }}
+      REPO_URL: ${{ inputs.repo_url }}
+      DEMO_URL: ${{ inputs.demo_url }}
+      DOCS_URL: ${{ inputs.docs_url }}
+      COUNTRY: ${{ inputs.country }}
+      AFFILIATION: ${{ inputs.affiliation }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Apply the changes
+        run: |
+          changes=()
+          [ "$STATUS" != "(keep)" ] && changes+=("status=$STATUS")
+          [ -n "$VERSION" ] && changes+=("version=$VERSION")
+          [ -n "$WEBSITE" ] && changes+=("website=$WEBSITE")
+          [ -n "$REPO_URL" ] && changes+=("repo_url=$REPO_URL")
+          [ -n "$DEMO_URL" ] && changes+=("demo_url=$DEMO_URL")
+          [ -n "$DOCS_URL" ] && changes+=("docs_url=$DOCS_URL")
+          [ -n "$COUNTRY" ] && changes+=("country=$COUNTRY")
+          [ -n "$AFFILIATION" ] && changes+=("affiliation=$AFFILIATION")
+          python scripts/update_card.py "$KIND" "$CARD" "${changes[@]}"
+
+      - name: Check that the site still builds
+        run: python scripts/build.py --strict
+
+      - name: Push a branch with the change
+        id: push
+        run: |
+          branch="update/${CARD}-${GITHUB_RUN_NUMBER}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A cards
+          git commit -m "Update ${KIND} ${CARD}"
+          git push origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Link to the pull request form
+        env:
+          BRANCH: ${{ steps.push.outputs.branch }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          {
+            echo "### The change is ready on branch \`$BRANCH\`"
+            echo
+            echo "**[Open the pull request](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${BASE}...${BRANCH}?expand=1)** - the *Validate cards* check runs on it, then merge it to update the site."
+          } >> "$GITHUB_STEP_SUMMARY"

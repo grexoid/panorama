@@ -101,6 +101,7 @@ status: active
 # version: 1.0.0
 # license: EUPL-1.2
 # affiliation: Name of your organisation
+# country: Austria          # visitors can filter by it; several: Austria, Italy
 # contact: Jane Doe <jane.doe@example.org>     # name first, e-mail in < >
 
 # Dates, written year-month-day. They are used for the "Recently updated"

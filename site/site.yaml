@@ -1,12 +1,18 @@
 # Site-wide settings for the gallery. Everything is optional.
-title: AI Projects Catalog          # shown in the top bar and browser tab
+title: PANORAMA                     # shown in the top bar and as the browser tab title
+# Shown as a tooltip when pointing at the title. **Double asterisks** mark the letters that spell the name.
+title_expansion: "**PAN**-European **O**pen **R**epository for **A**I **M**odels & **A**pplications"
 icon: "🌍"                          # emoji used as logo and favicon
-heading: Project gallery            # page heading
+heading: PANORAMA - an AI Project gallery   # main heading of the gallery page
 tagline: Geospatial and AI projects and use cases from our community.
 search_placeholder: Search projects, use cases, tags, technologies…
 
-# Target of the "Contribute" button. Leave empty to use the repository's README
-# (derived automatically when built by GitHub Actions).
+# The GitHub repository that holds the cards, as "owner/name". It is used for the "Edit on GitHub" links and
+# the "Contribute" button. Leave empty to take it from the build environment (GitHub Actions sets it).
+repository: ""
+branch: main                        # the branch the cards are edited on
+
+# Target of the "Contribute" button. Leave empty to use the repository's README.
 contribute_url: ""
 
 # Optional footer line (plain text).
