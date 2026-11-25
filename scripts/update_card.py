@@ -34,6 +34,7 @@ KINDS = {"project": "projects", "use-case": "use-cases"}
 TEXT = {"description", "summary", "challenge", "proposed_ai", "scope", "expected_outcome",
         "environmental_contribution", "digital_contribution", "contribution", "conditions"}
 LIST = {"tags", "stack"}
+IMAGES = "images"                                       # a use case's figures: one "file | caption" per line
 BOOLEANS = {"featured", "auto_tag"}
 DEFAULTS = {"status": "active", "featured": False, "auto_tag": True}    # what a card means when it leaves the field out
 DATES = {"released_on", "updated_on", "submitted_on"}
@@ -43,7 +44,7 @@ EDITABLE = {
                 "released_on", "updated_on"),
     "use-case": ("name", "quip", "summary", "main_area", "challenge", "proposed_ai", "scope", "expected_outcome",
                  "environmental_contribution", "digital_contribution", "contribution", "conditions", "affiliation", "country",
-                 "contact", "tags", "stack", "featured", "auto_tag", "submitted_on"),
+                 "contact", "tags", "stack", "featured", "auto_tag", "submitted_on", "images"),
 }
 SLUG = re.compile(r"[a-z0-9][a-z0-9-]*")
 
@@ -70,10 +71,24 @@ def split_list(value) -> list[str]:
     return list(seen.values())
 
 
+def image_lines(value) -> list[str]:
+    """A use case's figures as lines "file | caption" - from the card's list (files or {file, caption}) or from text."""
+    if isinstance(value, str):
+        return [" | ".join(part.strip() for part in line.split("|", 1)).rstrip(" |") for line in value.splitlines() if line.strip()]
+    lines = []
+    for entry in value or []:
+        file, caption = (entry.get("file") or entry.get("url"), entry.get("caption")) if isinstance(entry, dict) else (entry, "")
+        if file:
+            lines.append(f"{str(file).strip()} | {' '.join(str(caption).split())}" if caption else str(file).strip())
+    return lines
+
+
 def normal(key: str, value) -> object:
     """A value in a form that is equal when two values mean the same (used to spot changes that are none)."""
     if value is None:
         return ""
+    if key == IMAGES:
+        return tuple(image_lines(value))
     if key in LIST or key == "country":                  # several values: "EU,Austria", "EU, Austria" and a YAML list are the same
         return tuple(i.casefold() for i in split_list(value))
     if isinstance(value, list):
@@ -107,6 +122,14 @@ def render(key: str, value: str) -> list[str]:
     """The lines that write `key: value` into a card file."""
     if key in LIST:
         return [f"{key}:"] + [f"  - {scalar(key, item)}" for item in split_list(value)]
+    if key == IMAGES:
+        out = [f"{key}:"]
+        for line in image_lines(value):
+            file, _, caption = line.partition(" | ")
+            out.append(f"  - file: {scalar('file', file.strip())}")
+            if caption.strip():
+                out.append(f"    caption: {scalar('caption', caption.strip())}")
+        return out
     if key in TEXT:
         lines = clean_text(value).split("\n")
         lines[0] = lines[0].lstrip()                     # a block must not start with a space
@@ -142,7 +165,7 @@ def set_field(text: str, key: str, value: str) -> str:
     if span:
         lines[span[0]:span[1]] = new
         return "\n".join(lines)
-    if key not in TEXT and key not in LIST:             # the template's switched-off one-line field: switch it on
+    if key not in TEXT and key not in LIST and key != IMAGES:   # the template's switched-off one-line field: switch it on
         commented = next((i for i, line in enumerate(lines) if re.match(rf"#\s*{re.escape(key)}:(\s|$)", line)), None)
         if commented is not None:
             lines[commented] = new[0]
@@ -187,8 +210,10 @@ def update(kind: str, slug: str, changes: dict[str, str], cards_root: Path, toda
         text = set_field(text, key, value)
     path.write_text(text, encoding="utf-8")
     try:                                                 # the real rules; undo if the card would no longer be valid
-        if build.load_card(path, KINDS[kind], folder, {}, build.Problems()) is None:
-            raise UpdateError("the card would not be valid after this change (see above) - nothing was changed")
+        problems = build.Problems()
+        if build.load_card(path, KINDS[kind], folder, {}, problems) is None:
+            raise UpdateError("the card would not be valid after this change - nothing was changed. "
+                              + " ".join(f"{msg}." for _, msg in problems.errors))
     except BaseException:
         path.write_text(original, encoding="utf-8")
         raise

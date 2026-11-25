@@ -153,7 +153,7 @@ def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, tod
         # --- validate with the real rules; undo everything if the result is not a valid project --------
         check = build.Problems()
         if build.load_card(dst, "projects", dst_dir, {}, check) is None:
-            raise PromoteError("the new project card would not be valid (see above) - nothing was changed")
+            raise PromoteError("the new project card would not be valid - nothing was changed. " + " ".join(f"{msg}." for _, msg in check.errors))
     except BaseException:
         dst.unlink(missing_ok=True)
         for path in copied:

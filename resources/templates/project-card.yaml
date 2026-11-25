@@ -35,12 +35,12 @@
 name: My Project Name
 
 # What the project does, in a few sentences. Shown when someone hovers over
-# the card. The "|" below means "several lines follow"; keep every line
-# indented by two spaces. A blank line starts a new paragraph.
+# the card. Keep it SHORT: one paragraph, at most 500 characters - a longer
+# text makes the expanded card too tall to scroll, and the check fails.
+# The "|" below means "several lines follow"; keep every line indented by
+# two spaces. A blank line starts a new paragraph.
 description: |
   Describe in two to four sentences what the project does and who it is for.
-
-  A second paragraph is fine if you need it.
 
 # Links. You need AT LEAST ONE of "website" and "repo_url".
 # Always give the full address, starting with https://

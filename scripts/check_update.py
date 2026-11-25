@@ -148,6 +148,7 @@ def main() -> int:
         refused("project", "demo", {"released_on": "yesterday"}, "a bad date")
         refused("project", "demo", {"website": "", "repo_url": ""}, "removing every link (card would be invalid)")
         refused("project", "demo", {"description": ""}, "removing the description (card would be invalid)")
+        refused("project", "demo", {"description": "word " * 120}, "a description beyond the length limit")
         refused("project", "../x", {"status": "active"}, "a path-like name")
         refused("project", "missing", {"status": "active"}, "an unknown card")
         refused("use-case", "idea", {"main_area": "Everything"}, "an invalid main area")

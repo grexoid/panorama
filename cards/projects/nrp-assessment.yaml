@@ -8,8 +8,7 @@ quip: Human-in-the-loop AI assisted assessment of national restoration plans for
 description: |
   A local large language model (Gemma4 or Qwen 3.6) pre-assesses each National Restoration Plan against the ETC-DI
   analytical grid and produces referenced draft ratings that assessors review and adjust, instead of starting from a blank page.
-
-  The use case applies a large language model to pre-assess each National Restoration Plan against an assessment framework (“analytical grid”), producing structured ratings (adequate / inadequate / good / not applicable) per criterion together with supporting references back to the source text. Assessors interact with the tool through a simple web interface, reviewing and adjusting the AI-generated ratings and narrative summary rather than starting each assessment from a blank page. Human judgement remains central: every AI-generated rating is treated as a draft for expert validation, not a final decision.
+  Every AI-generated rating is a draft for expert validation, not a final decision.
 
 repo_url: https://github.com/eea/ETC-DI_LLM_NRP
 
