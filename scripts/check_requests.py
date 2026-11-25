@@ -241,6 +241,11 @@ def main() -> int:
 
         expect(card_images.allowed_address("https://github.com/user-attachments/assets/x") and
                card_images.allowed_address("https://private-user-images.githubusercontent.com/1/a.png?jwt=x"), "GitHub attachment addresses refused")
+        expect(card_images.allowed_redirect("https://github-production-user-asset-6210df.s3.amazonaws.com/1/2-abc.webp?X-Amz-Expires=300"),
+               "GitHub's attachment storage is refused as a redirect target")
+        expect(not any(card_images.allowed_redirect(u) for u in ("https://evil.s3.amazonaws.com/a.png", "http://github-production-user-asset-6210df.s3.amazonaws.com/a",
+                                                                 "https://github-production-user-asset-6210df.s3.amazonaws.com.evil.org/a",
+                                                                 "https://s3.amazonaws.com/github-production-user-asset-6210df/a")), "a foreign storage host was allowed")
         expect(not any(card_images.allowed_address(u) for u in ("http://github.com/user-attachments/assets/x", "https://example.org/a.png",
                                                                "https://github.com/other/repo/a.png", "https://evilgithubusercontent.com/a.png",
                                                                "https://github.com.evil.org/user-attachments/x")), "a foreign address was allowed")

@@ -42,6 +42,16 @@ def allowed_address(url: str) -> bool:
     return (host == "github.com" and parts.path.startswith("/user-attachments/")) or host.endswith(".githubusercontent.com")
 
 
+STORAGE_HOST = re.compile(r"github-production-[a-z-]+-[0-9a-f]+\.s3\.amazonaws\.com")   # where GitHub keeps attachments
+
+
+def allowed_redirect(url: str) -> bool:
+    """Where an attachment address may lead: GitHub's own hosts, or the storage bucket GitHub keeps attachments in."""
+    parts = urlparse(url)
+    host = (parts.hostname or "").lower()
+    return allowed_address(url) or (parts.scheme == "https" and bool(STORAGE_HOST.fullmatch(host)))
+
+
 def find_attachments(text: str) -> list[tuple[str, str]]:
     """(alt text, address) of every picture in `text` - Markdown pictures, <img> tags and bare attachment addresses."""
     found: list[tuple[str, str]] = []
@@ -78,8 +88,8 @@ def download(url: str) -> bytes:
                          "To use a picture from elsewhere, type its plain web address instead of a picture.")
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "panorama-card-requests"}), timeout=TIMEOUT_SECONDS) as response:
-            if not allowed_address(response.geturl()):
-                raise ImageError("The picture's address led somewhere that is not a GitHub attachment.")
+            if not allowed_redirect(response.geturl()):
+                raise ImageError(f"The picture's address led to {urlparse(response.geturl()).hostname}, which is not where GitHub keeps attachments.")
             data = response.read(build.MAX_IMAGE_BYTES + 1)
     except OSError as exc:
         raise ImageError(f"The picture could not be downloaded ({exc}). Is it still attached to the issue?") from exc
