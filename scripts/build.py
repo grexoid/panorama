@@ -34,6 +34,8 @@ from urllib.parse import urlparse
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+import card_forms
 from markupsafe import Markup, escape
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -327,6 +329,7 @@ def common_part(raw: dict, where: str, folder: str, folder_dir: Path, media, pro
         "quip": as_text(raw.get("quip")),
         "featured": featured,
         "affiliation": as_text(raw.get("affiliation")),
+        "contact_raw": contact_raw,
         "contact_name": contact_name,
         "contact_email": contact_email,
         "tag_labels": as_list(raw.get("tags"), where, "tags", problems),
@@ -359,6 +362,7 @@ def project_part(raw: dict, where: str, problems: Problems) -> dict:
         problems.warn(where, "'updated_on' is earlier than 'released_on'")
 
     return {
+        "description_raw": description,
         "paragraphs": [" ".join(p.split()) for p in re.split(r"\n\s*\n", description) if p.strip()],
         "category": as_text(raw.get("category")),
         "status": status,
@@ -427,8 +431,13 @@ def use_case_part(raw: dict, where: str, folder: str, folder_dir: Path, media, p
         else:
             groups.append({"sections": [entry]})
 
+    def raw_text(value) -> str:      # the text as written in the card (a YAML list counts as bullet points)
+        return "\n".join(f"- {as_text(v)}" for v in value) if isinstance(value, list) else as_text(value)
+
     return {
         "initials": "💡",
+        "summary_explicit": as_text(raw.get("summary")),
+        "raw_text": {field: raw_text(raw.get(field)) for field in SECTION_FIELDS},
         "groups": groups,
         "area": area,
         "area_key": area[0] if area else "",
@@ -586,6 +595,47 @@ def build_area_facet(cards: list[dict]) -> list[dict]:
     ]
 
 
+def promotion_description(card: dict) -> str:
+    """The description a use case gets when it becomes a project: its summary, then the start of "proposed use of AI"."""
+    proposed = next((s["blocks"] for s in card["sections"] if s["field"] == "proposed_ai"), [])
+    paragraphs = [b["text"] for b in proposed if b["kind"] == "p"]
+    explicit = bool(card["summary_explicit"])
+    return "\n\n".join(([card["summary"]] if explicit else []) + paragraphs[: 1 if explicit else 2]) or card["summary"]
+
+
+def update_values(card: dict) -> dict[str, str]:
+    """A card's current content as the text of the boxes in the Update form (field id -> text)."""
+    values = {
+        "name": card["name"], "quip": card["quip"], "country": card["country"], "affiliation": card["affiliation"],
+        "contact": card["contact_raw"], "tags": ", ".join(card["tag_labels"]), "stack": ", ".join(card["stack_labels"]),
+    }
+    if card["type"] == "project":
+        values.update(description=card["description_raw"].strip(), status=card["status"], version=card["version"],
+                      license=card["license"], category=card["category"], **{k: v or "" for k, v in card["links"].items()})
+    else:
+        values.update(summary=card["summary_explicit"], main_area=card["area_label"], **card["raw_text"])
+    return values
+
+
+def promote_values(card: dict) -> dict[str, str]:
+    """What the Promote form is pre-filled with. Projects are not tagged automatically, so the automatic tags are included."""
+    return {
+        "name": card["name"], "quip": card["quip"], "description": promotion_description(card), "status": "beta",
+        "country": card["country"], "affiliation": card["affiliation"], "contact": card["contact_raw"],
+        "tags": ", ".join([*card["tag_labels"], *card["auto_tags"]]), "stack": ", ".join([*card["stack_labels"], *card["auto_stack"]]),
+    }
+
+
+def request_links(repo_url: str, card: dict) -> tuple[str, str]:
+    """Addresses of the card's Update button and (use cases only) Promote button: GitHub forms, filled in with the card."""
+    update_form = card_forms.FORMS["update-project" if card["type"] == "project" else "update-use-case"]
+    update = card_forms.prefill_url(repo_url, update_form, card["slug"], update_values(card))
+    promote = ""
+    if card["type"] == "use-case":
+        promote = card_forms.prefill_url(repo_url, card_forms.FORMS["promote-use-case"], card["slug"], promote_values(card))
+    return update, promote
+
+
 def related_use_cases(card: dict, use_cases: list[dict], limit: int = 3) -> list[dict]:
     mine = {t["key"] for t in card["tags"]}
     scored = []
@@ -682,15 +732,17 @@ def b64(data: bytes) -> str:
 class Vault:
     """AES-256-GCM, with the key stretched from the site password by PBKDF2-HMAC-SHA256.
 
-    The salt is fixed per build, so a browser derives the key once per session and then opens every page and
-    image. Each encrypted blob carries its own random 96-bit IV in front of the ciphertext."""
+    The salt is a public constant of the site (not random per build). That matters: the key therefore stays the same
+    from one deployment to the next, so a browser that still has an older encrypted image or page in its cache (GitHub
+    Pages lets browsers keep files for 10 minutes) can still decrypt it, and a visitor is not asked for the password
+    again after every deployment. Each encrypted blob carries its own random 96-bit IV in front of the ciphertext."""
 
-    def __init__(self, password: str) -> None:
+    def __init__(self, password: str, salt: bytes) -> None:
         try:
             from cryptography.hazmat.primitives.ciphers.aead import AESGCM
         except ImportError as exc:  # pragma: no cover
             raise SystemExit("Password protection needs the 'cryptography' package: pip install -r requirements.txt") from exc
-        self.salt = os.urandom(16)
+        self.salt = salt
         self._aes = AESGCM(hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), self.salt, PBKDF2_ITERATIONS, 32))
 
     def seal(self, data: bytes) -> bytes:
@@ -727,7 +779,9 @@ def main() -> int:
         print(f"Refusing to build an unprotected site: the environment variable {PASSWORD_ENV} is empty or not set.\n"
               f"On GitHub: Settings -> Secrets and variables -> Actions -> New repository secret named {PASSWORD_ENV}.")
         return 1
-    vault = Vault(password) if password else None
+    site = load_site_config(site_dir / "site.yaml")
+    salt = hashlib.sha256(f"panorama-gallery:{site['repository'] or site['title']}".encode("utf-8")).digest()[:16]
+    vault = Vault(password, salt) if password else None
     print(f"Password protection: {'ON - pages and images are encrypted' if vault else 'OFF (set ' + PASSWORD_ENV + ' to switch it on)'}")
 
     # --- read cards ---------------------------------------------------------
@@ -778,11 +832,8 @@ def main() -> int:
             shutil.copy2(source, target)
     (out_dir / ".nojekyll").write_text("", encoding="utf-8")
 
-    site = load_site_config(site_dir / "site.yaml")
-    folder_of = {ctype: folder for folder, ctype in CARD_FOLDERS.items()}
-    for card in cards:   # link to GitHub's editor for the card's file (empty when the repository is unknown)
-        card["edit_url"] = (f"{site['repo_url']}/edit/{site['branch']}/cards/{folder_of[card['type']]}/{card['slug']}.yaml"
-                            if site["repo_url"] else "")
+    for card in cards:   # the Update / Promote buttons need to know the repository; without it they are left out
+        card["update_url"], card["promote_url"] = request_links(site["repo_url"], card) if site["repo_url"] else ("", "")
     favicon = (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
         f'<text x="50" y="52" font-size="82" text-anchor="middle" dominant-baseline="central">{html.escape(str(site["icon"]))}</text></svg>'

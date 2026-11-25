@@ -1,0 +1,116 @@
+name: Card requests
+
+# The Update and Promote buttons on the cards open a GitHub issue form that is already filled in with the card's content
+# (the forms are defined in scripts/card_forms.py and generated into .github/ISSUE_TEMPLATE/).
+# Submitting such a form starts this workflow. It applies the request to a copy of the repository, checks that the site
+# still builds, pushes the result to a new branch and replies on the issue with a link that opens the pull request - so a
+# person looks at the change, and the "Validate cards" check runs on it, before anything is merged.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  apply:
+    # Only people with write access to the repository can change cards this way. The kind of request is recognised by the
+    # title the form gives the issue.
+    if: >-
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+      (startsWith(github.event.issue.title, 'Update project: ') ||
+       startsWith(github.event.issue.title, 'Update use case: ') ||
+       startsWith(github.event.issue.title, 'Promote use case: '))
+    runs-on: ubuntu-latest
+    # The issue's text is passed as environment variables, never pasted into shell commands.
+    env:
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Apply the request
+        id: apply
+        continue-on-error: true
+        run: python scripts/card_request.py > "$RUNNER_TEMP/report.md"
+
+      - name: Check that the site still builds
+        id: build
+        if: steps.apply.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/build.py --strict > "$RUNNER_TEMP/build.log" 2>&1
+
+      - name: Push a branch with the change
+        id: push
+        if: steps.apply.outcome == 'success' && steps.build.outcome == 'success'
+        run: |
+          branch="requests/issue-${ISSUE_NUMBER}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A cards
+          git commit -m "${ISSUE_TITLE} (#${ISSUE_NUMBER})"
+          git push origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Reply on the issue
+        if: always()
+        env:
+          APPLIED: ${{ steps.apply.outcome }}
+          BUILT: ${{ steps.build.outcome }}
+          BRANCH: ${{ steps.push.outputs.branch }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          reply="$RUNNER_TEMP/reply.md"
+          if [ -n "$BRANCH" ]; then
+            title=$(jq -rn --arg v "$ISSUE_TITLE" '$v|@uri')
+            {
+              cat "$RUNNER_TEMP/report.md"
+              echo
+              echo "The change is on the branch \`$BRANCH\`."
+              echo
+              echo "**[Open the pull request](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${BASE}...${BRANCH}?expand=1&title=${title}&body=Closes%20%23${ISSUE_NUMBER})** - the *Validate cards* check runs on it; merge it to update the site. This issue closes automatically."
+            } > "$reply"
+          elif [ "$APPLIED" != "success" ]; then
+            cat "$RUNNER_TEMP/report.md" > "$reply" 2>/dev/null || echo "**This request could not be applied.** See the workflow run for details." > "$reply"
+          elif [ "$BUILT" != "success" ]; then
+            {
+              cat "$RUNNER_TEMP/report.md"
+              echo
+              echo "**But the site no longer builds with this change, so nothing was pushed.** The build said:"
+              echo
+              echo '```'
+              tail -n 30 "$RUNNER_TEMP/build.log"
+              echo '```'
+            } > "$reply"
+          else
+            echo "**Something went wrong after the change was applied.** See the [workflow run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})." > "$reply"
+          fi
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$reply"
+
+  refuse:
+    # Anyone who can read a public repository can open an issue; only collaborators may change cards. Say so, politely.
+    if: >-
+      !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+      (startsWith(github.event.issue.title, 'Update project: ') ||
+       startsWith(github.event.issue.title, 'Update use case: ') ||
+       startsWith(github.event.issue.title, 'Promote use case: '))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: >
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY"
+          --body "Thank you for the suggestion. Cards can only be changed this way by people with write access to the repository, so nothing was changed. A maintainer can use this issue as the basis for the change."

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Self-test for scripts/update_card.py (quick edits of existing project and use-case cards).
+"""Self-test for scripts/update_card.py (edits of existing project and use-case cards).
 
 Runs in a temporary cards folder, so nothing in the repository is touched.
 
@@ -43,6 +43,8 @@ challenge: |
   A problem.
 proposed_ai: |
   An idea.
+conditions: |
+  - First condition.
 """
 
 
@@ -63,32 +65,73 @@ def main() -> int:
         project.write_text(PROJECT, encoding="utf-8")
         use_case.write_text(USE_CASE, encoding="utf-8")
 
-        # 1. project: replace, switch on a commented template line, add a new field, auto-bump updated_on -----
+        def data(path: Path) -> dict:
+            return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+        # 1. one-line fields: replace, switch on a commented template line, add, bump updated_on ------------------
         update_card.update("project", "demo", {"status": "active", "version": "1.2.0", "demo_url": "https://example.org/demo", "country": "Italy"},
                            cards, today=today)
         text = project.read_text(encoding="utf-8")
-        data = yaml.safe_load(text)
-        expect(data["status"] == "active" and data["version"] == "1.2.0", f"values: {data}")
-        expect(data["demo_url"] == "https://example.org/demo" and "# demo_url" not in text, "commented line was not switched on")
+        d = data(project)
+        expect(d["status"] == "active" and d["version"] == "1.2.0", f"values: {d}")
+        expect(d["demo_url"] == "https://example.org/demo" and "# demo_url" not in text, "commented line was not switched on")
         expect("# version" not in text and text.count("version:") == 1, "commented version line should have been replaced")
-        expect(data["country"] == "Italy", "new field was not added")
-        expect(str(data["updated_on"]) == "2026-11-25", f"updated_on not bumped: {data.get('updated_on')!r}")
+        expect(d["country"] == "Italy", "new field was not added")
+        expect(str(d["updated_on"]) == "2026-11-25", f"updated_on not bumped: {d.get('updated_on')!r}")
         expect(text.startswith("# A comment that must survive."), "leading comment lost")
-        expect("Second paragraph." in text and data["tags"] == ["one", "two"], "text or list was damaged")
+        expect(d["tags"] == ["one", "two"] and "Second paragraph." in d["description"], "text or list was damaged")
 
-        # 2. empty value removes a field; an explicit updated_on is respected ---------------------------------
-        update_card.update("project", "demo", {"demo_url": "", "updated_on": "2026-01-02"}, cards, today=today)
-        data = yaml.safe_load(project.read_text(encoding="utf-8"))
-        expect("demo_url" not in data, "field was not removed")
-        expect(str(data["updated_on"]) == "2026-01-02", f"explicit updated_on overwritten: {data['updated_on']!r}")
+        # 2. long text and lists --------------------------------------------------------------------------------
+        new_description = "New first paragraph.\r\n\r\n- a bullet\r\n- another bullet\r\n\r\nLast paragraph."
+        update_card.update("project", "demo", {"description": new_description, "tags": "land use, Modelling, land use"}, cards, today=today)
+        text = project.read_text(encoding="utf-8")
+        d = data(project)
+        expect(d["description"].strip() == "New first paragraph.\n\n- a bullet\n- another bullet\n\nLast paragraph.", f"description: {d['description']!r}")
+        expect(d["tags"] == ["land use", "Modelling"], f"tags (deduplicated, in order): {d['tags']!r}")
+        expect(d["website"] == "https://example.org/demo" and d["status"] == "active", "fields after the replaced blocks were damaged")
+        expect(text.startswith("# A comment that must survive.") and "# inline comment" in text, "comments on untouched lines must survive")
+        update_card.update("project", "demo", {"stack": "Python, R"}, cards, today=today)
+        expect(data(project)["stack"] == ["Python", "R"], "a list that did not exist yet was not added")
 
-        # 3. use case ----------------------------------------------------------------------------------------
-        update_card.update("use-case", "idea", {"country": "Italy", "affiliation": "Agency: North"}, cards)
-        data = yaml.safe_load(use_case.read_text(encoding="utf-8"))
-        expect(data["country"] == "Italy" and data["affiliation"] == "Agency: North", f"use case values: {data}")
-        expect("updated_on" not in data, "use cases have no updated_on")
+        # 3. values that are the same as now change nothing --------------------------------------------------------
+        before = project.read_text(encoding="utf-8")
+        for same in ({"status": "active"}, {"tags": "land use,  modelling"}, {"description": new_description + "\n\n"}, {"country": "Italy"}):
+            try:
+                update_card.update("project", "demo", same, cards, today=dt.date(2030, 1, 1))
+                failures.append(f"accepted an unchanged value: {same}")
+            except update_card.UpdateError:
+                pass
+        expect(project.read_text(encoding="utf-8") == before, "an unchanged request modified the file (or bumped updated_on)")
 
-        # 4. refusals leave the file exactly as it was -------------------------------------------------------
+        # 3b. defaults and list-valued country count as "the same" -------------------------------------------------
+        (cards / "projects" / "plain.yaml").write_text(
+            "name: Plain\ndescription: text\nwebsite: https://example.org\ncountry:\n  - Italy\n  - Greece\n", encoding="utf-8")
+        for same in ({"status": "active"}, {"country": "Italy, Greece"}, {"featured": "false"}):
+            try:
+                update_card.update("project", "plain", same, cards, today=today)
+                failures.append(f"a field that already has this value (or default) was changed: {same}")
+            except update_card.UpdateError:
+                pass
+        update_card.update("project", "plain", {"status": "beta"}, cards, today=today)
+        expect(data(cards / "projects" / "plain.yaml")["status"] == "beta", "status was not added to a card that left it out")
+
+        # 4. removal: a one-line field and a whole list ---------------------------------------------------------
+        update_card.update("project", "demo", {"demo_url": "", "stack": "", "updated_on": "2026-01-02"}, cards, today=today)
+        d = data(project)
+        expect("demo_url" not in d and "stack" not in d, f"fields were not removed: {sorted(d)}")
+        expect(str(d["updated_on"]) == "2026-01-02" and d["tags"] == ["land use", "Modelling"], "explicit updated_on overwritten, or another list removed")
+
+        # 5. use case: texts with bullets, areas ---------------------------------------------------------------------
+        update_card.update("use-case", "idea", {"country": "Italy", "affiliation": "Agency: North",
+                                                "conditions": "- First condition.\n- Second condition.", "challenge": "A better problem statement."}, cards)
+        d = data(use_case)
+        expect(d["country"] == "Italy" and d["affiliation"] == "Agency: North", f"use case values: {d}")
+        expect(d["conditions"].strip() == "- First condition.\n- Second condition." and d["challenge"].strip() == "A better problem statement.", "use-case texts")
+        expect(d["proposed_ai"].strip() == "An idea." and "updated_on" not in d, "other sections must stay; use cases have no updated_on")
+        update_card.update("use-case", "idea", {"main_area": "People, Skills and Ways of Working"}, cards)
+        expect(data(use_case)["main_area"] == "People, Skills and Ways of Working", "main area")
+
+        # 6. refusals leave the file exactly as it was ---------------------------------------------------------------
         def refused(kind: str, slug: str, changes: dict, why: str) -> None:
             path = cards / update_card.KINDS[kind] / f"{slug}.yaml"
             before = path.read_text(encoding="utf-8") if path.exists() else None
@@ -97,22 +140,21 @@ def main() -> int:
                 failures.append(f"accepted: {why}")
             except update_card.UpdateError:
                 pass
-            after = path.read_text(encoding="utf-8") if path.exists() else None
-            expect(before == after, f"file changed although {why}")
+            expect((path.read_text(encoding="utf-8") if path.exists() else None) == before, f"file changed although {why}")
 
         refused("project", "demo", {"status": "finished"}, "an invalid status")
-        refused("project", "demo", {"description": "x"}, "a multi-line field")
-        refused("project", "demo", {"tags": "x"}, "a list field")
         refused("project", "demo", {"colour": "red"}, "an unknown field")
         refused("project", "demo", {"featured": "maybe"}, "a bad boolean")
         refused("project", "demo", {"released_on": "yesterday"}, "a bad date")
         refused("project", "demo", {"website": "", "repo_url": ""}, "removing every link (card would be invalid)")
+        refused("project", "demo", {"description": ""}, "removing the description (card would be invalid)")
         refused("project", "../x", {"status": "active"}, "a path-like name")
         refused("project", "missing", {"status": "active"}, "an unknown card")
         refused("use-case", "idea", {"main_area": "Everything"}, "an invalid main area")
+        refused("use-case", "idea", {"challenge": ""}, "removing a required section")
         refused("use-case", "idea", {"status": "active"}, "a project-only field on a use case")
 
-        # 5. the CLI and the real build accept the result ---------------------------------------------------
+        # 7. the CLI and the real build accept the result ---------------------------------------------------------
         done = subprocess.run([sys.executable, str(HERE / "update_card.py"), "project", "demo", "version=2.0.0", "--cards", str(cards)],
                               capture_output=True, text=True)
         expect(done.returncode == 0, f"CLI failed: {done.stdout}{done.stderr}")

@@ -16,13 +16,24 @@
   const key = crypto.subtle.importKey('raw', Uint8Array.from(atob(stored), (c) => c.charCodeAt(0)), 'AES-GCM', false, ['decrypt']);
   const cache = new Map();                                    // the same file is often used several times on a page
 
+  async function decryptFile(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`${url}: ${response.status}`);
+    const bytes = new Uint8Array(await response.arrayBuffer());     // 12-byte IV, then ciphertext + tag
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, await key, bytes.slice(12));
+  }
+
   function load(url) {
     if (!cache.has(url)) {
       cache.set(url, (async () => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`${url}: ${response.status}`);
-        const bytes = new Uint8Array(await response.arrayBuffer());   // 12-byte IV, then ciphertext + tag
-        const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, await key, bytes.slice(12));
+        let plain;
+        try {
+          plain = await decryptFile(url);
+        } catch (e) {
+          // Not decryptable: most likely an older copy of the file left in the browser cache by a previous deployment
+          // (or by a changed password). Ask the server again, bypassing the cache, before giving up.
+          plain = await decryptFile(url, { cache: 'reload' });
+        }
         const type = TYPES[url.replace(/\.enc$/, '').split('.').pop().toLowerCase()] || 'application/octet-stream';
         return URL.createObjectURL(new Blob([plain], { type }));
       })());

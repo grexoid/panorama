@@ -115,14 +115,14 @@
         {% endif %}
       </div>
 
-      {% if card.edit_url %}
+      {% if card.update_url %}
       <div class="x-panel x-update">
-        <h2>Update this card</h2>
+        <h2>This card</h2>
         <ul class="x-actions">
-          <li><a href="{{ card.edit_url }}" target="_blank" rel="noopener">{{ icon('edit') }}Edit on GitHub</a></li>
-          <li><a href="{{ site.repo_url }}/actions/workflows/promote-card.yml" target="_blank" rel="noopener">{{ icon('rocket') }}Turn it into a project</a></li>
+          <li><a href="{{ card.update_url }}" target="_blank" rel="noopener">{{ icon('edit') }}Update</a></li>
+          {% if card.promote_url %}<li><a href="{{ card.promote_url }}" target="_blank" rel="noopener">{{ icon('rocket') }}Promote to project</a></li>{% endif %}
         </ul>
-        <p>Changes go through a pull request and are checked automatically.</p>
+        <p>Opens a form on GitHub, filled in with this card. Changes go through a pull request and are checked automatically.</p>
       </div>
       {% endif %}
 

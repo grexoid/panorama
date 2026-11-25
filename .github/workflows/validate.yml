@@ -10,6 +10,7 @@ on:
       - "resources/examples/**"
       - "site/**"
       - "scripts/**"
+      - ".github/ISSUE_TEMPLATE/**"
       - "requirements.txt"
 
 permissions:
@@ -47,12 +48,17 @@ jobs:
         run: |
           python scripts/build.py --strict --require-password --out "$RUNNER_TEMP/protected"
           python scripts/check_protected.py "$RUNNER_TEMP/protected"
+          # A second deployment must use the same key: a browser may still hold files of the first one in its cache.
+          python scripts/build.py --strict --require-password --out "$RUNNER_TEMP/protected-2"
+          python scripts/check_protected.py "$RUNNER_TEMP/protected-2" --same-key-as "$RUNNER_TEMP/protected"
 
-      # The tools that change cards must keep working (each test builds its own sample cards).
+      # The tools that change cards must keep working (each test works on sample cards or a copy of the real ones).
       - name: Check the Word importer
         run: python scripts/check_importer.py
 
-      - name: Check the card update and promote tools
+      - name: Check the card update, promote and request tools
         run: |
+          python scripts/card_forms.py --check
           python scripts/check_update.py
           python scripts/check_promote.py
+          python scripts/check_requests.py
