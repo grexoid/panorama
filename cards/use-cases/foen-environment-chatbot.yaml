@@ -1,0 +1,56 @@
+# Draft generated from submissions/use-cases/foen-environment-chatbot.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Internal environmental data chatbot
+quip: Source-referenced answers from dossiers and FOEN publications
+summary: |
+  A chatbot searches dossier documents and the FOEN knowledge base and answers questions in
+  natural language with traceable source references, supporting staff without replacing
+  expert judgement.
+
+main_area: AI Applications and Value Creation
+affiliation: Federal Office for the Environment (FOEN)
+country: Switzerland
+
+challenge: |
+  FOEN staff frequently need quick access to scattered internal documents, dossiers and
+  public FOEN publications to answer questions on environmental policy, regulation or
+  reporting. Manually searching across different repositories and knowledge sources is
+  time-consuming and leads to uneven access to knowledge among staff.
+
+proposed_ai: |
+  A chatbot searches dossier-related documents as well as the FOEN knowledge base (websites,
+  publications) and provides context-aware, source-referenced answers in natural language.
+  It supports staff in information retrieval but does not replace the expert judgement and
+  decision-making responsibility of specialists.
+
+scope: |
+  - Answering questions based on dossier documents (text, images) and the public FOEN
+    knowledge base
+  - Simple calculations and data analysis on request
+  - Summarising and linking information across multiple documents
+  - No automated decision-making on technical or legal matters
+
+expected_outcome: |
+  The chatbot is expected to significantly reduce the time spent on information retrieval
+  and enable more even, faster access to internal and public environmental knowledge.
+  Success would be shown by shorter response times, correctly referenced sources and
+  positive user acceptance.
+
+environmental_contribution: |
+  The assistant facilitates access to environmental data and reports, supporting
+  better-informed and faster decisions in environmental matters.
+
+digital_contribution: |
+  The use case strengthens cross-office data management and the linking of environmental
+  data as envisaged in the FOEN Strategy 2030, and lays the groundwork for a targeted,
+  responsible use of AI within the office.
+
+conditions: |
+  - Access rights and confidentiality of dossier documents must be clearly regulated
+  - Answers must always include traceable source references
+  - Quality and up-to-dateness of the underlying knowledge base must be ensured
+  - Human review must remain mandatory for questions with technical or legal relevance
+  - The solution should be designed for reuse in other internal use cases
+  - Dependence on foreign companies (Use case uses anthropic models)

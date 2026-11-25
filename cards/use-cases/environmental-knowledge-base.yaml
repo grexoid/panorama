@@ -1,0 +1,108 @@
+# Draft generated from submissions/use-cases/Environmental_KB_AI_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: AI-driven environmental knowledge base
+quip: Answers from trusted sources only – with citations
+summary: |
+  A knowledge base populated exclusively with documents from trusted institutions answers
+  questions in natural language, cites its sources and supports semantic search and
+  summarisation, countering unverified claims.
+
+main_area: AI Applications and Value Creation
+
+challenge: |
+  The environmental sector is characterized by an unprecedented proliferation of data and
+  information. Over the past decade, governments, intergovernmental organizations, research
+  institutes, regulatory bodies, and industry players have collectively produced a vast and
+  ever-growing body of publications, reports, technical notes, legislative texts, scientific
+  studies, and policy documents.
+
+  While this wealth of information is, in principle, an asset, it gives rise to several
+  major operational challenges:
+
+  - It has become increasingly difficult and time-consuming to locate accurate,
+    contextually relevant, and properly sourced information amidst millions of documents.
+  - Alongside reliable information, a significant volume of unverified or erroneous
+    content is in circulation.
+
+  Consequently, using standard search engines or consumer-grade AI tools does not always
+  yield verified and reliable information.
+
+proposed_ai: |
+  There is an abundance of reliable information produced by trusted entities, and these
+  resources can be pooled. Rather than relying on a general-purpose large language model
+  (LLM) trained on the open internet, this use case proposes creating a specialized
+  knowledge base (KB) populated exclusively with content from selected trusted entities—such
+  as government agencies, intergovernmental organizations, accredited research laboratories,
+  regulatory bodies, and other duly validated institutional publishers.
+
+  Developing a document database populated exclusively by reliable sources would facilitate
+  the use of environmental information resources.
+
+scope: |
+  The scope encompasses data, documents, online publications, and information from reliable
+  sources, offering the following potential capabilities:
+
+  - natural language question-answering with source citation
+  - document and corpus search (keyword-based and semantic)
+  - document summarization (single document or corpus)
+  - writing assistance (generation of notes as drafts)
+
+  Covered topics could include the environment, energy, transport, climate and housing.
+
+  Users could be staff members as well as partners.
+
+  For more reliable and accuracy responses, the KB could be divided in different document
+  collections to improve retrieval precision and reduce cross-topic noise.
+
+expected_outcome: |
+  An AI-powered conversational agent will answer questions based solely on reliable sources,
+  specifying exactly which source is used for each answer.
+
+  Searching for documents and information will become faster and more reliable.
+
+  Summarizing documents or sets of information will also be made easier.
+
+  The solution relies on a trusted document base designed to be enriched over time, thereby
+  offering the potential for increasingly diverse applications.
+
+environmental_contribution: |
+  By making verified environmental data immediately accessible, the knowledge base enables
+  decision-makers to assess the situation in specific sectors or regions more quickly and
+  accurately.
+
+  In an environment where many unverified claims circulate, the ability to provide rapid,
+  well-sourced, and fact-checked answers strengthens the capacity to counter misinformation
+  with authoritative evidence.
+
+  The citation and traceability mechanism ensures that any environmental claim can be
+  verified against its original source, thereby reinforcing the information's credibility.
+
+digital_contribution: |
+  The knowledge base is owned and controlled in-house, and its data ingestion is governed by
+  defined quality standards, avoiding any reliance on third-party AI services.
+
+  The architecture is modular and scalable: new thematic collections, trusted sources, and
+  user groups can be added incrementally without the need to overhaul the core system.
+
+conditions: |
+  The technical architecture is based on a RAG (Retrieval-Augmented Generation) approach.
+
+  The tool requires no specialized skills. It is an internal support tool populated by
+  trusted contributors, intended solely for use by staff and partners. The content (corpus,
+  Q&A) is not meant for direct external dissemination but may be used to draft specific
+  communications.
+
+  Although the knowledge base is populated exclusively from reliable sources, the primary
+  challenge lies in the risk of errors ("hallucinations") or inaccuracies (such as the
+  omission of available information) in the responses generated by the LLM. Consequently,
+  monitoring results (involving automated checks potentially supplemented by optional human
+  validation) and rejecting certain responses, could be considered as complementary
+  measures.
+
+  Some solutions are already experimented in the French Ministry of Ecological Transition.
+
+images:
+  - file: images/environmental-knowledge-base/figure-1.png
+    caption: Retrieval-augmented generation over a regularly updated database of verified sources

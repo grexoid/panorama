@@ -1,12 +1,12 @@
 name: Deploy gallery
 
-# Merging a PR that adds or changes a project card (or the site itself) rebuilds
+# Merging a PR that adds or changes a card (or the site itself) rebuilds
 # the static site and publishes it to GitHub Pages.
 on:
   push:
     branches: [main]
     paths:
-      - "projects/**"
+      - "cards/**"
       - "site/**"
       - "scripts/**"
       - "requirements.txt"

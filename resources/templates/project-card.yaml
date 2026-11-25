@@ -4,14 +4,15 @@
 # =============================================================================
 #
 #  WHAT TO DO
-#   1. Copy this file into the "projects" folder and rename it after your
+#   1. Copy this file into the "cards/projects" folder and rename it after your
 #      project, using only lowercase letters, digits and dashes - for example
-#      projects/forest-watch.yaml. The file name is not shown on the website.
+#      cards/projects/forest-watch.yaml. The file name is not shown on the website.
+#      (An idea that has not become a project yet? Use use-case-card.yaml instead.)
 #   2. Replace the example text after each "field:" with your own.
 #   3. Lines that start with "#" are notes for you; the website ignores them.
 #      Lines marked OPTIONAL are switched off - delete the "# " at the start
 #      of a line to use it.
-#   4. Save, and submit the file (see "Adding a project" in the README).
+#   4. Save, and submit the file (see "Adding a card" in the README).
 #      A check runs automatically and tells you if anything needs fixing.
 #
 #  THE FEW RULES OF THIS FILE FORMAT (it is called YAML)
@@ -86,7 +87,7 @@ status: active
 
 # Pictures. Without them the card shows a coloured tile with the project's
 # initials. Either paste a full https:// address, or add the picture file to
-# the "projects/images" folder and write its path as shown below.
+# the "cards/projects/images" folder and write its path as shown below.
 #   screenshot_url: the large picture shown on hover (landscape, about 1200 x 600 px)
 #   thumbnail_url:  the small square icon on the card (about 128 x 128 px)
 # Allowed formats: png, jpg, webp, gif, svg. Please keep each file under 1.5 MB.

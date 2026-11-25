@@ -1,0 +1,67 @@
+# Draft generated from submissions/use-cases/Italy_soil_loss.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: AI-driven spatial foresight for soil loss in Italian metropolitan cities
+quip: Scenario maps of future soil sealing up to 2030
+summary: |
+  Artificial neural networks combined with cellular automata simulate where soil sealing is
+  likely to occur in Italy's 14 metropolitan cities, including the effect of policy events
+  such as new protected areas or the Nature Restoration Regulation.
+
+main_area: AI Applications and Value Creation
+affiliation: ISPRA and SNPA
+country: Italy
+
+challenge: |
+  Predicting Soil Loss is complex because key drivers like demographic growth and natural
+  hazards do not always have a direct impact on land take. Additionally, working with 4D
+  spatiotemporal data requires determining not only the amount of loss, but also its exact
+  location. This complexity creates a major challenge for researchers, policy makers, and
+  public administrations. Tackling this challenge is essential for developing effective
+  strategies to limit soil sealing and mitigate climate change.
+
+proposed_ai: |
+  AI and advanced tools such as the Geographical Foundation Models show great potential in
+  pinpointing where future soil sealing will occur, but they are still under evaluation.
+  Building on ISPRA and SNPA's initial foresight efforts, we integrate AI directly into our
+  analysis pipeline. This approach generates detailed maps of newly sealed soil while
+  providing explicit prediction error metrics. Finally, the findings are contextualized
+  against historical trends to deliver targeted insights for individual metropolitan cities.
+
+scope: |
+  The annual ISPRA/SNPA Soil Loss report evaluates land take, its underlying causes, and its
+  broader environmental impacts. Our experiment uses the MOLUSCE QGIS plugin, combining
+  Artificial Neural Networks (ANN) for training with Cellular Automata for spatial
+  simulation. Rather than simple forecasting, the model incorporates policy events—such as
+  new protected areas or the European Nature Restoration Regulation—to create realistic
+  scenarios. Applied across Italy’s 14 metropolitan cities, this year's study marks a
+  transition from statistical Weights of Evidence to advanced ANN modeling.
+
+expected_outcome: |
+  The final aim of the work is to be able to produce a scenarization not only on the 14
+  metropolitan cities but on the entire Italian territory, an attempt in this sense is in
+  progress by seting up the elaboration flow on a supercomputer located on CINECA facilities
+  to speed up the elaboration conducted on many raster layers contemporarily, as required
+  from the formal model. The successfulness of the scenarization is currently tested against
+  the 5-previous-years soil loss trend and the numerical simulation, done also via AI tools
+  but without the spatial dimension. This piece of information produced is relevant for the
+  decision makers and stakeholders (together with raise awareness on citizens) to take the
+  best decision and direct investments for future urban planning. Moreover, the possibility
+  to choose among different scenarios will give them some specific directions directly
+  related to possible decision to take.
+
+contribution: |
+  By embedding Artificial Neural Networks into spatial simulations, this project provides
+  high-resolution predictive maps of soil loss up to 2030. The inclusion of dynamic scenario
+  parameters allows local authorities to assess the real-world impact of upcoming
+  environmental legislation. Ultimately, these AI-driven outputs empower policy makers to
+  make data-backed decisions aligned with UN Sustainable Development Goals and EU
+  restoration directives.
+
+conditions: |
+  - Availability of checked and reliable input data for the model
+  - Availability of appropriate calculation power
+  - Human oversight over the entire procedure
+  - AI application basic skills, advanced GIS and foresight competencies
+  - The final aim of the procedure should be the geographical generalization of the model

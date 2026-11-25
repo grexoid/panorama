@@ -1,0 +1,142 @@
+# Draft generated from submissions/use-cases/ITALY__MASE_DVA_AI for Environmental Assessment.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Impact assessment in the age of artificial intelligence – the Italian experience
+quip: A shared AI framework for EIA and SEA procedures
+summary: |
+  Italy's environment ministry, the Regions and IAIA Italy build an Environmental Governance
+  Platform that applies AI to environmental impact and strategic assessments, to harmonise
+  methods and make assessments more objective.
+
+main_area: AI Applications and Value Creation
+affiliation: Ministry of the Environment and Energy Security (MASE)
+country: Italy
+
+challenge: |
+  In environmental assessment procedures for plans, programmes and projects, the competent
+  authorities sometimes apply criteria that are not objective. Responsibility for
+  environmental matters in Italy is spread across several levels, so a wide variety of
+  criteria, methodologies and operating practices is in use, and the large number of
+  procedures demands considerable human and material resources.
+
+  The problem is felt by the Ministry of the Environment and Energy Security (MASE), the
+  Regions and the Autonomous Provinces, who are the competent authorities for their
+  respective procedures. This year MASE launched a working group with them, supported by the
+  International Association for Impact Assessment (IAIA) Italy, to share common rules, adopt
+  harmonised methods and criteria and make assessments more objective.
+
+  What is needed is a coordinated approach, at international and national level, to the use
+  of AI in environmental assessment. IAIA, a global network active in more than 130
+  countries, entrusted IAIA Italy with coordinating a common framework through the project
+  IAIA25: Impact Assessment in the Age of Artificial Intelligence. Through a protocol
+  agreement with IAIA Italy, MASE joined this effort, taking responsibility for coordinating
+  the Regions and Autonomous Provinces and for testing AI-based tools in assessment
+  procedures.
+
+proposed_ai: |
+  In Environmental Impact Assessment (EIA) and Strategic Environmental Assessment (SEA), AI
+  could help manage and analyse large volumes of technical documentation, improve access to
+  information, support impact assessment and make better use of monitoring and control data.
+  It would analyse technical and administrative documents, environmental baseline
+  information, monitoring data, consultation inputs and information on plans, programmes and
+  projects, and could generate summaries, classifications, metadata, structured knowledge
+  frameworks and decision-support outputs based on validated, controlled sources.
+
+  The work is developed within the Environmental Governance Platform (EGP), a methodological
+  infrastructure built on territorial clustering, comparable knowledge frameworks and
+  interoperable digital tools. Users work on a shared platform that supports cooperation
+  between competent authorities and harmonised methods across administrative levels.
+
+  The final decision on a project's environmental compatibility or a plan's sustainability
+  stays with the competent authority. AI supports decisions and does not replace them; the
+  models and algorithms are shared, validated and overseen by groups of experts.
+
+scope: |
+  - Process: the use of AI in EIA and SEA procedures – management of technical
+    documentation, analysis of environmental data, project characterisation, cumulative
+    impact assessment and verification of environmental conditions.
+  - Users: MASE, the Regions, the Autonomous Provinces, other competent authorities,
+    environmental agencies, project developers and technical consultants.
+  - Data: validated environmental, territorial and administrative datasets, GIS layers,
+    monitoring data, assessment documentation and information on plans, programmes and
+    projects, processed through the EGP.
+  - Coverage: national, regional and local assessment processes within a shared governance
+    framework. AI supports analysis and decision-making but does not replace scientific
+    methods, regulatory requirements or human responsibility.
+  - International cooperation: the project will be presented in a peer-to-peer exchange
+    with the French administration under an EU-funded TAIEX study visit. It aims to
+    improve transboundary EIA and SEA procedures under the Espoo Convention and the Kiev
+    Protocol, where Italy is UNECE National Focal Point; Slovenia and Greece have shown
+    interest, and cooperation with Uzbekistan has started.
+  - Not addressed directly: defence policies, critical infrastructure and energy security,
+    although the project is coordinated with the Ministry of Defence.
+
+expected_outcome: |
+  The expected outcome is the implementation of the Environmental Governance Platform (EGP),
+  enabling competent authorities to use shared knowledge frameworks, standardised impact
+  codification methods and interoperable environmental data. This will support cumulative
+  impact assessment, adaptive monitoring, and the definition of mitigation and compensation
+  measures through a common governance framework. Success will be demonstrated by the
+  activation of regional knowledge frameworks, pilot projects and the progressive deployment
+  of the EGP at national, regional and local levels.
+
+environmental_contribution: |
+  The use case improves environmental monitoring, reporting and assessment by integrating
+  monitoring data, indicators and AI-supported analysis into assessment procedures, enabling
+  more systematic impact evaluation and adaptive monitoring.
+
+  - It strengthens the evidence base for policy through shared knowledge frameworks,
+    standardised datasets and data-driven methods.
+  - It improves access to environmental knowledge by making territorial data, monitoring
+    information and assessment results more accessible and comparable across
+    administrations.
+  - It supports climate, biodiversity, circular-economy and pollution objectives by
+    improving impact assessment, DNSH implementation, climate-proofing, cumulative impact
+    analysis and the identification of mitigation and compensation measures.
+  - It helps understand and reduce the footprint of digitalisation by considering the
+    impacts of AI itself – data centres, energy and water use – within assessment
+    processes.
+
+digital_contribution: |
+  - Improves digital services with AI-enabled tools for document management, data
+    integration and decision support.
+  - Strengthens interoperability through common GIS-based knowledge frameworks, shared
+    datasets and standardised data structures.
+  - Enables responsible automation – document analysis, information retrieval,
+    summarisation and preliminary assessments – while preserving human oversight and
+    accountability.
+  - Builds AI and digital capabilities through pilots, shared experimentation, common
+    methodologies, training and cooperation between authorities.
+  - Supports reusable and scalable solutions: the same governance model, impact-coding
+    methods and tools can be deployed across territories and administrative levels.
+  - Improves collaboration and knowledge sharing among competent authorities, scientific
+    institutions and international partners.
+  - Contributes to trustworthy AI through a governance framework based on transparency,
+    data quality, traceability, privacy protection, human oversight and continuous
+    monitoring of AI impacts.
+
+conditions: |
+  The initiative requires high-quality, continuously updated environmental datasets, shared
+  GIS-based knowledge frameworks and interoperability standards. Clear arrangements for data
+  governance, access rights, cybersecurity, privacy and technological sovereignty are
+  essential, and AI outputs must remain transparent, traceable and subject to human
+  oversight. Public administrations need adequate skills, organisational capacity and
+  digital infrastructure, supported by capacity building, common methodologies and
+  sufficient institutional resources. The environmental footprint of AI and digital
+  infrastructure should be considered, and solutions should remain reusable, scalable and
+  adaptable across territories and administrative levels.
+
+  At the launch of the project the stakeholders agreed on ten guiding principles for the use
+  of AI in environmental assessments:
+
+  - Accountability
+  - Transparency
+  - Information
+  - Data quality, traceability and reliability
+  - Methodological integration
+  - Expertise and training
+  - Supervision – human in the loop
+  - Privacy protection
+  - Prevention of model collapse
+  - Monitoring the impact of AI

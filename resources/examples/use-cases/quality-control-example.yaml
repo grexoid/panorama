@@ -1,0 +1,48 @@
+# Example use-case card, taken from the "intended level of detail" example in the Word
+# template (submissions/use-cases_template.docx). To write your own card, start from
+# resources/templates/use-case-card.yaml.
+
+name: AI-assisted quality control of environmental reporting data
+quip: Spot data-quality problems earlier, focus expert time
+summary: |
+  AI flags potential anomalies in submitted environmental data and directs experts to the
+  records that need a closer look, while the experts stay in charge of validation.
+
+main_area: AI Applications and Value Creation
+
+challenge: |
+  Currently, reporting and data experts spend substantial effort identifying missing values,
+  inconsistencies and unusual patterns in environmental reporting data. This can delay
+  feedback to reporters and reduce the time available for expert analysis.
+
+proposed_ai: |
+  The use case would apply AI to identify and prioritise potential anomalies in submitted
+  environmental data. It would support reporting and data experts by directing their
+  attention to records requiring further review, while experts would remain responsible
+  for validating findings and deciding on follow-up.
+
+scope: |
+  The use case covers initial quality screening of selected environmental reporting
+  dataflows. It uses submitted data, validation rules and relevant historical records.
+  It does not include fully automated acceptance or rejection of reported data.
+
+expected_outcome: |
+  The expected outcome is earlier identification of potential data-quality issues and more
+  focused use of expert capacity. Success would be demonstrated by useful detection of
+  anomalies, faster feedback and reduced repetitive screening.
+
+contribution: |
+  The use case contributes to the environmental agenda by improving the reliability and
+  timeliness of information used for environmental monitoring and assessment. It supports
+  the digital agenda by strengthening data quality and introducing responsible automation
+  into reporting services.
+
+conditions: |
+  - Suitable and representative data must be available.
+  - Results must be transparent enough for expert validation.
+  - Data ownership and responsibilities must be clear.
+  - Human review must remain part of the workflow.
+  - The solution should be designed for possible reuse across dataflows.
+
+affiliation: Example Environment Agency
+country: Austria

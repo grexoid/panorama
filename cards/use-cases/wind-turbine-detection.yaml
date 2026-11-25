@@ -1,0 +1,55 @@
+# Draft generated from submissions/use-cases/Wind turbine detection_AI Lab Germany.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Detection of onshore wind turbines from satellite imagery
+quip: A regularly updated geolocation dataset of wind turbines
+summary: |
+  A YOLO object-detection pipeline finds onshore wind turbines in PlanetScope satellite
+  imagery and builds a versioned, high-precision dataset of their locations for Germany,
+  showing both the current state and its development over time.
+
+main_area: AI Applications and Value Creation
+affiliation: KI-Lab, German environment portfolio
+country: Germany
+
+challenge: |
+  The number of wind turbines is rising rapidly with the energy transition, and their
+  locations have to be monitored for sectors well beyond energy — from radar-based weather
+  forecasting to spatial planning. Existing datasets are imprecise or limited in coverage,
+  so a high-precision, regularly updated geolocation dataset is missing.
+
+proposed_ai: |
+  An automated pipeline detects onshore wind turbines in satellite imagery (PlanetScope,
+  RGB) using a YOLO object detection model. Data acquisition, preprocessing and inference
+  run automatically and are repeated periodically, producing a versioned dataset that shows
+  both the current state and its development over time.
+
+scope: |
+  - Territory of Germany, with an optional 100 km buffer zone.
+  - Geolocation of existing onshore turbines only.
+  - Not included: derivation of plant parameters such as rotor length or hub height, and
+    detection of offshore turbines.
+  - Designed to scale: the area can be extended, for example to European level, and
+    complementary sources such as LiDAR can add data depth.
+
+expected_outcome: |
+  A regularly updated, uniform and high-resolution dataset of wind turbine locations that is
+  more precise than what is available today. It supports an accurate current-state overview
+  as well as time-series analysis of construction and decommissioning, and serves as a basis
+  for uncluttering radar data, monitoring infrastructure lifecycles and comparing energy
+  yields.
+
+contribution: |
+  The dataset supports the energy transition by making the expansion of renewable
+  infrastructure measurable, which helps reconcile competing interests in spatial and
+  land-use planning. Digitally, it establishes a standardised, machine-readable data basis
+  that can be analysed along several dimensions and enriched with further sources.
+
+conditions: |
+  - Timely availability and quality of satellite data from providers are critical
+    dependencies.
+  - Human review must remain part of the workflow, especially when scaling geographically
+    or across longer time intervals, as turbine appearance and design change.
+  - The model is trained on existing onshore turbines; offshore plants or substantially
+    new designs require further model development.

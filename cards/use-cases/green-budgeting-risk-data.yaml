@@ -1,0 +1,63 @@
+# Draft generated from submissions/use-cases/green_budgeting_risk data_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: AI-assisted extraction of physical risk data for green budgeting
+quip: Finding the geolocation and asset types hidden in public budgets
+summary: |
+  AI extracts geolocation and asset-type information from the budget data of Austrian
+  municipalities, closing a key data gap for assessing the physical climate risk of public
+  assets within a hazard–exposure–vulnerability model.
+
+main_area: AI Applications and Value Creation
+country: Austria
+
+challenge: |
+  Green budgeting refers to the use of budgetary policy-making tools to better understand
+  environmental impact of spending choices, and ensure public budgets are aligned with
+  climate and environmental objectives. According to an OECD study incorporating “green” in
+  financial risk analysis is the least developed green budgeting method. Grave data gaps
+  hinder developments. One key gap therein are risk-related data of assets belonging to
+  public entities: geolocation, asset type, vulnerability.
+
+  However, in many cases, public budgets do have some of these data points in an
+  unstructured or semi-structured format. However extracting this available information in a
+  comprehensive manner has not been done yet.
+
+proposed_ai: |
+  Within the Hazard-Exposure-Vulnerability (HEV) risk assessment model AI can be applied to
+  extract geolocation data (to evaluate exposure) and asset type information (to evaluate
+  vulnerability) out of public (scope: Austrian municipalities) budget data in a structured
+  manner.
+
+  Because this involves processing thousands of financial line items, human validation must
+  be integrated through a workflow that balances data quality with operational feasibility.
+
+scope: |
+  - Local AI models
+  - Budget data of Austrian municipalities
+  - Prototyping approach
+  - Extraction of geodata and asset classifications
+
+expected_outcome: |
+  - Automated extraction of physical risk data points
+  - A precondition for the physical risk assessment of public budgets
+  - Enables financial risk management in an environment of growing, systemic
+    climate-related risks
+
+environmental_contribution: |
+  - Improves and enables fiscal-environmental risk management
+  - Strengthens the evidence base for financial decision-making
+  - Supports climate action, especially in the context of green budgeting
+
+digital_contribution: |
+  - Connects financial data with GIS and other environmental data
+  - Builds sovereign AI capabilities
+  - Supports secure, reusable and scalable solutions
+
+conditions: |
+  - Availability and quality of digital infrastructure
+  - Quality of local models
+  - Since public budget lines do not change significantly, running the application can be
+    viewed as a one-time effort with scattered ad-hoc re-runs; hence hardware-related
+    speed constraints are not expected to be an issue

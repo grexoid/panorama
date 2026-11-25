@@ -1,13 +1,14 @@
-name: Validate project cards
+name: Validate cards
 
-# Runs on every PR so mistakes in a project card show up as annotations on the
-# changed file instead of a failed deployment after merging.
+# Runs on every PR so mistakes in a card show up as annotations on the changed
+# file instead of a failed deployment after merging.
 on:
   pull_request:
     paths:
-      - "projects/**"
+      - "cards/**"
       - "resources/templates/**"
       - "resources/examples/**"
+      - "submissions/**"
       - "site/**"
       - "scripts/**"
       - "requirements.txt"
@@ -31,10 +32,15 @@ jobs:
       - name: Build site (strict)
         run: python scripts/build.py --strict
 
-      # Keep the blank template and the example cards valid, so what people copy always works.
-      - name: Check template and examples
+      # Keep the blank templates and the example cards valid, so what people copy always works.
+      - name: Check templates and examples
         run: |
-          mkdir "$RUNNER_TEMP/template"
-          cp resources/templates/project-card.yaml "$RUNNER_TEMP/template/"
-          python scripts/build.py --strict --projects "$RUNNER_TEMP/template" --out "$RUNNER_TEMP/template-out"
-          python scripts/build.py --strict --projects resources/examples --out "$RUNNER_TEMP/examples-out"
+          mkdir -p "$RUNNER_TEMP/templates/projects" "$RUNNER_TEMP/templates/use-cases"
+          cp resources/templates/project-card.yaml "$RUNNER_TEMP/templates/projects/"
+          cp resources/templates/use-case-card.yaml "$RUNNER_TEMP/templates/use-cases/"
+          python scripts/build.py --strict --cards "$RUNNER_TEMP/templates" --out "$RUNNER_TEMP/templates-out"
+          python scripts/build.py --strict --cards resources/examples --out "$RUNNER_TEMP/examples-out"
+
+      # The Word importer must keep working on the official template document.
+      - name: Check the Word importer
+        run: python scripts/import_use_case.py submissions/use-cases_template.docx --out "$RUNNER_TEMP/imported" --force
