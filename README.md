@@ -54,6 +54,13 @@ images:
     caption: How the pieces fit together
 ```
 
+**Adding or replacing pictures with the Update button:** the Update issue has a **Screenshot** and a **Logo** section (projects) or an **Images** section (use cases). Drag a picture file into that section's text (or paste it, or use the paperclip below the box); GitHub uploads it and inserts a line such as `![Image](https://github.com/user-attachments/assets/...)`. When the issue is created, the workflow downloads the picture into `cards/<type>/images/<card-name>/` and sets it on the card, so it appears in the pull request like any other file.
+
+- A project's screenshot or logo is **replaced** by the picture; type a single dash (`-`) to remove it. A use case's pictures are **added** to its figures (the existing ones stay; a dash removes all of them). Text you write inside the brackets, for example `![Overview of the workflow](...)`, becomes the figure's caption.
+- png, jpg, gif and webp up to 1.5 MB are accepted; the file's content is checked, not just its name. svg and other file types are refused. Pictures are only taken from files attached to the issue; for a picture elsewhere on the web, type its plain address into the Screenshot or Logo section.
+- A replaced picture's old file stays in the `images` folder (the card simply no longer points at it); delete it in the pull request if you want it gone.
+- The repository is public, so a picture attached to an issue is public too. Please only attach pictures you may publish.
+
 Only publish pictures you are allowed to: no personal data (names, e-mail addresses, screenshots of internal tools showing real people) and nothing copyrighted by others.
 
 ### No Git experience? Use the browser
@@ -66,7 +73,7 @@ You can do all of this on github.com without installing anything:
 4. Click **Commit changes...**, choose **Create a new branch and start a pull request**, then **Propose changes** and **Create pull request**.
 5. Wait a minute for the **Validate cards** check. If it shows a red cross, open the details: it names the line to fix. Edit the file in the same pull request and the check runs again.
 
-To add a picture the same way, open the card type's `images` folder, choose **Add file -> Upload files**, and select **Commit directly to the branch** of your pull request.
+To add a picture without the Update button, open the card type's `images` folder, choose **Add file -> Upload files**, and select **Commit directly to the branch** of your pull request.
 
 ### Use cases submitted as Word documents
 
@@ -112,7 +119,7 @@ What this does **not** do - please read before relying on it:
 | Field                               | Required     | Notes                                                                     |
 | ----------------------------------- | ------------ | ------------------------------------------------------------------------- |
 | `name`                              | yes          | Card title                                                                |
-| `description`                       | yes          | Shown when the card is expanded. Blank lines start a new paragraph.       |
+| `description`                       | yes          | Shown when the card is expanded: one short paragraph, **at most 500 characters** (longer texts fail the check). |
 | `quip`                              |              | One-line teaser shown on the collapsed card                               |
 | `website`, `repo_url`               | at least one | Shown as **Website** and **Repository** buttons                           |
 | `demo_url`, `docs_url`              |              | Optional **Demo** and **Docs** buttons                                    |
@@ -169,6 +176,7 @@ Only people with write access to the repository can change cards this way; for a
 
 **Good to know**
 
+- A card's description is limited to 500 characters: one short paragraph. A longer text fails the check with a message that says so, because a very long description makes the expanded card too tall to scroll.
 - An address on the web has a length limit. If a card has so much text that it does not all fit into the button's address, the longest texts are left out of the issue text; such a section is marked and empty, which means *the card's text stays as it is*. To replace one of those texts, write the new text under its heading.
 - GitHub remembers unsaved issue text for the browser tab it was typed in. The buttons open a **new tab**, so you normally start clean; if you ever see an older text instead of the card's, close the tab and click the button in the gallery again.
 - Every card is a single file, so you can also edit it directly on GitHub (the pencil on `cards/projects/<name>.yaml` or `cards/use-cases/<name>.yaml`) and open a pull request. To remove a card, delete its file (and its images) in a pull request; the address of a removed use case's page stops working. Renaming a card means renaming its file; the address of a use case's page changes with it.

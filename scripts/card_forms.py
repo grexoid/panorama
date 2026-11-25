@@ -52,6 +52,7 @@ class Form:
 
 
 CARD = Field("card", "Card (file name)", hint="do not change")
+PICTURE_HINT = "drag a picture file into this box to replace it (png, jpg, gif, webp up to 1.5 MB), or give an address; a dash removes it"
 HOW_TO_EDIT = (
     "Change the text under the headings, then press **Create**. A section you leave as it is keeps that part of the card; "
     "type a single dash (`-`) to remove a value; empty sections are ignored. "
@@ -66,11 +67,13 @@ UPDATE_PROJECT = Form(
         CARD,
         Field("name", "Name"),
         Field("quip", "Teaser"),
-        Field("description", "Description", "textarea", "blank line = new paragraph"),
+        Field("description", "Description", "textarea", "one short paragraph, at most 500 characters"),
         Field("website", "Website"),
         Field("repo_url", "Repository"),
         Field("demo_url", "Demo"),
         Field("docs_url", "Documentation"),
+        Field("screenshot_url", "Screenshot", hint=PICTURE_HINT + "; landscape, about 1200 x 600"),
+        Field("thumbnail_url", "Logo", hint=PICTURE_HINT + "; square, about 128 x 128"),
         Field("status", "Status", "choice", options=(KEEP, *STATUSES)),
         Field("version", "Version"),
         Field("license", "License"),
@@ -104,6 +107,9 @@ UPDATE_USE_CASE = Form(
         Field("environmental_contribution", "Contribution to the environment", "textarea"),
         Field("digital_contribution", "Contribution to the digital agenda", "textarea"),
         Field("conditions", "Key conditions and considerations", "textarea", "lines starting with '- ' are bullet points"),
+        Field("images", "Images", "textarea",
+              "drag picture files into this box to ADD them to the figures (existing ones stay; a dash removes all); "
+              "text under a picture becomes its caption. Only png, jpg, gif, webp up to 1.5 MB"),
     ),
 )
 
@@ -119,7 +125,7 @@ PROMOTE_USE_CASE = Form(
         CARD,
         Field("name", "Name"),
         Field("quip", "Teaser"),
-        Field("description", "Description", "textarea", "pre-filled from the use case; blank line = new paragraph"),
+        Field("description", "Description", "textarea", "pre-filled from the use case; one short paragraph, at most 500 characters"),
         Field("website", "Website", hint="give this and/or the repository"),
         Field("repo_url", "Repository"),
         Field("demo_url", "Demo", hint="optional"),

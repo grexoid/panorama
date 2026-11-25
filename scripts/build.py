@@ -80,6 +80,7 @@ LINK_FIELDS = ("website", "repo_url", "demo_url", "docs_url")
 IMAGE_FIELDS = ("screenshot_url", "thumbnail_url")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif", ".svg"}
 MAX_IMAGE_BYTES = 1_500_000
+DESCRIPTION_MAX = 500            # characters; a longer description makes the expanded card too tall to scroll
 
 COMMON_FIELDS = {"name", "quip", "tags", "stack", "affiliation", "country", "contact", "featured", *IMAGE_FIELDS}
 PROJECT_FIELDS = COMMON_FIELDS | {
@@ -337,6 +338,8 @@ def common_part(raw: dict, where: str, folder: str, folder_dir: Path, media, pro
         "country_labels": as_list(raw.get("country"), where, "country", problems),   # one, a comma list or a YAML list
         "screenshot": resolve_image(raw.get("screenshot_url"), where, "screenshot_url", folder, folder_dir, media, problems),
         "thumbnail": resolve_image(raw.get("thumbnail_url"), where, "thumbnail_url", folder, folder_dir, media, problems),
+        "screenshot_raw": as_text(raw.get("screenshot_url")),
+        "thumbnail_raw": as_text(raw.get("thumbnail_url")),
         "hue": stable_int(name) % 360,
         "initials": initials(name),
     }
@@ -346,6 +349,9 @@ def project_part(raw: dict, where: str, problems: Problems) -> dict:
     description = as_text(raw.get("description"))
     if not description:
         problems.error(where, "missing required field 'description'")
+    elif len(" ".join(description.split())) > DESCRIPTION_MAX:
+        problems.error(where, f"'description' is {len(' '.join(description.split()))} characters long, the limit is {DESCRIPTION_MAX}: "
+                              "keep it to one short paragraph (a few sentences) - long texts make the expanded card too tall")
 
     links = {f: check_url(as_text(raw.get(f)), where, f, problems) for f in LINK_FIELDS}
     if not (links["website"] or links["repo_url"]):
@@ -596,11 +602,15 @@ def build_area_facet(cards: list[dict]) -> list[dict]:
 
 
 def promotion_description(card: dict) -> str:
-    """The description a use case gets when it becomes a project: its summary, then the start of "proposed use of AI"."""
+    """The description a use case gets when it becomes a project: its summary, plus - if there is room within
+    DESCRIPTION_MAX - the start of "proposed use of AI". Short on purpose: the card must stay easy to scroll."""
     proposed = next((s["blocks"] for s in card["sections"] if s["field"] == "proposed_ai"), [])
     paragraphs = [b["text"] for b in proposed if b["kind"] == "p"]
-    explicit = bool(card["summary_explicit"])
-    return "\n\n".join(([card["summary"]] if explicit else []) + paragraphs[: 1 if explicit else 2]) or card["summary"]
+    text = card["summary"]
+    room = DESCRIPTION_MAX - len(text) - 2
+    if card["summary_explicit"] and paragraphs and room >= 150:
+        text += "\n\n" + excerpt(paragraphs[0], room)
+    return text
 
 
 def update_values(card: dict) -> dict[str, str]:
@@ -611,7 +621,8 @@ def update_values(card: dict) -> dict[str, str]:
     }
     if card["type"] == "project":
         values.update(description=card["description_raw"].strip(), status=card["status"], version=card["version"],
-                      license=card["license"], category=card["category"], **{k: v or "" for k, v in card["links"].items()})
+                      license=card["license"], category=card["category"], screenshot_url=card["screenshot_raw"],
+                      thumbnail_url=card["thumbnail_raw"], **{k: v or "" for k, v in card["links"].items()})
     else:
         values.update(summary=card["summary_explicit"], main_area=card["area_label"], **card["raw_text"])
     return values

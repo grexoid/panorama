@@ -35,6 +35,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import build  # noqa: E402
 import card_forms  # noqa: E402
+import card_images  # noqa: E402
 import card_request  # noqa: E402
 
 REPO = "https://github.com/example/gallery"
@@ -225,6 +226,88 @@ def main() -> int:
             failures.append("an invalid choice was accepted")
         except card_request.RequestError as exc:
             expect("Use one of" in str(exc) and "maintenance" in str(exc), f"the refusal does not list the options: {exc}")
+
+        # 3b. pictures dragged into the text -----------------------------------------------------------------------------
+        png = b"\x89PNG\r\n\x1a\n" + b"fake-image-data-1"
+        png2 = b"\x89PNG\r\n\x1a\n" + b"fake-image-data-2"
+        jpg = b"\xff\xd8\xff\xe0" + b"fake-jpeg"
+        pictures = {"https://github.com/user-attachments/assets/aaa": png, "https://github.com/user-attachments/assets/bbb": png2,
+                    "https://github.com/user-attachments/assets/ccc": jpg, "https://github.com/user-attachments/assets/text": b"just text",
+                    "https://github.com/user-attachments/assets/big": b"\x89PNG\r\n\x1a\n" + b"x" * (build.MAX_IMAGE_BYTES + 10)}
+        fetch = pictures.__getitem__
+
+        def stored(folder: str) -> set[str]:
+            return {p.relative_to(root / folder).as_posix() for p in (root / folder / "images").rglob("*") if p.is_file()}
+
+        expect(card_images.allowed_address("https://github.com/user-attachments/assets/x") and
+               card_images.allowed_address("https://private-user-images.githubusercontent.com/1/a.png?jwt=x"), "GitHub attachment addresses refused")
+        expect(not any(card_images.allowed_address(u) for u in ("http://github.com/user-attachments/assets/x", "https://example.org/a.png",
+                                                               "https://github.com/other/repo/a.png", "https://evilgithubusercontent.com/a.png",
+                                                               "https://github.com.evil.org/user-attachments/x")), "a foreign address was allowed")
+
+        form, _, title, body = button(by_slug["demo-project"])
+        edited = with_section(body, form, "screenshot_url", "![Image](https://github.com/user-attachments/assets/aaa)")
+        edited = with_section(edited, form, "thumbnail_url", '<img width="64" alt="Image" src="https://github.com/user-attachments/assets/ccc" />')
+        report = card_request.apply_request(title, edited, root, fetch)
+        after = yaml.safe_load(path.read_text(encoding="utf-8"))
+        shot, logo = str(after.get("screenshot_url")), str(after.get("thumbnail_url"))
+        expect(re.fullmatch(r"images/demo-project/screenshot-[0-9a-f]{8}\.png", shot) and (root / "projects" / shot).read_bytes() == png,
+               f"screenshot: {shot!r}\n{report}")
+        expect(re.fullmatch(r"images/demo-project/logo-[0-9a-f]{8}\.jpg", logo) and (root / "projects" / logo).read_bytes() == jpg, f"logo: {logo!r}")
+        expect("added picture" in report, "the report does not mention the added pictures")
+        # the text now pre-filled by the button holds the new path, and submitting it unchanged changes nothing
+        again = load_all(root)
+        for card in again:
+            if card["slug"] == "demo-project":
+                form, _, title, body = button(card)
+                expect(shot in body, "the button does not pre-fill the new screenshot path")
+                try:
+                    card_request.apply_request(title, body, root, fetch)
+                    failures.append("a card with pictures changed by its own pre-filled text")
+                except card_request.RequestError as exc:
+                    expect("nothing changed" in str(exc), f"unexpected refusal: {exc}")
+        card_request.apply_request(title, with_section(body, form, "thumbnail_url", "-"), root, fetch)
+        expect("thumbnail_url" not in yaml.safe_load(path.read_text(encoding="utf-8")), "a dash did not remove the logo")
+
+        idea_path = root / "use-cases" / "long-idea.yaml"
+        form, _, title, body = button(by_slug["long-idea"], "update")
+        before_files = stored("use-cases")
+        first = with_section(body, form, "images", "![Image](https://github.com/user-attachments/assets/aaa)\n"
+                                                  "![Overview of the workflow](https://github.com/user-attachments/assets/bbb)")
+        card_request.apply_request(title, first, root, fetch)
+        figures = yaml.safe_load(idea_path.read_text(encoding="utf-8")).get("images") or []
+        expect(len(figures) == 2 and figures[0].get("caption") is None and figures[1].get("caption") == "Overview of the workflow",
+               f"figures: {figures!r}")
+        expect(len(stored("use-cases") - before_files) == 2, "the two pictures were not stored")
+        card_request.apply_request(title, with_section(body, form, "images", "![Image](https://github.com/user-attachments/assets/ccc)"), root, fetch)
+        figures = yaml.safe_load(idea_path.read_text(encoding="utf-8")).get("images") or []
+        expect(len(figures) == 3 and all(f["file"].startswith("images/long-idea/figure-") for f in figures), f"figures were not added to: {figures!r}")
+        built = subprocess.run([sys.executable, str(HERE / "build.py"), "--strict", "--cards", str(root), "--out", str(Path(tmp) / "out")],
+                               capture_output=True, text=True)
+        expect(built.returncode == 0, f"the build rejects the cards with pictures:\n{built.stdout[-800:]}{built.stderr[-400:]}")
+
+        # pictures that cannot be used are refused, and nothing is left behind
+        snapshot, text_before = stored("use-cases") | stored("projects"), idea_path.read_text(encoding="utf-8")
+        for why, picture, needle in (("a foreign address", "![x](https://example.org/a.png)", "only taken from files attached"),
+                                     ("a file that is no picture", "![x](https://github.com/user-attachments/assets/text)", "png, jpg, gif and webp"),
+                                     ("a very large picture", "![x](https://github.com/user-attachments/assets/big)", "larger than")):
+            try:
+                card_request.apply_request(title, with_section(body, form, "images", picture), root, card_images.download if "foreign" in why else fetch)
+                failures.append(f"accepted: {why}")
+            except card_request.RequestError as exc:
+                expect(needle in str(exc), f"{why}: the message does not explain: {exc}")
+        expect(stored("use-cases") | stored("projects") == snapshot and idea_path.read_text(encoding="utf-8") == text_before,
+               "a refused picture left files or changes behind")
+
+        # 3c. a description beyond the limit is refused with the reason, and the card stays as it was ------------------
+        form, _, title, body = button(by_slug["demo-project"])
+        text_before = path.read_text(encoding="utf-8")
+        try:
+            card_request.apply_request(title, with_section(body, form, "description", "Many words here. " * 40), root, fetch)
+            failures.append("a description beyond the limit was accepted")
+        except card_request.RequestError as exc:
+            expect("characters long" in str(exc) and str(build.DESCRIPTION_MAX) in str(exc), f"the refusal does not give the reason: {exc}")
+        expect(path.read_text(encoding="utf-8") == text_before, "a refused description changed the card")
 
         # 4. promote: edited description, country, tags and technologies must all arrive --------------------------------
         idea = by_slug["demo-idea"]
