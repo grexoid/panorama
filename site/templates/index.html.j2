@@ -187,7 +187,7 @@
               {% if card.released and card.released != card.updated %}<div><dt>Released</dt><dd><time datetime="{{ card.released.isoformat() }}">{{ card.released_text }}</time></dd></div>{% endif %}
               {% if card.contact_name %}<div><dt>Contact</dt><dd>{% if card.contact_email %}<a href="mailto:{{ card.contact_email }}">{{ card.contact_name }}</a>{% else %}{{ card.contact_name }}{% endif %}</dd></div>{% endif %}
               {% endif %}
-              {% if card.edit_url %}<div><dt>Card</dt><dd><a class="edit-link" href="{{ card.edit_url }}" target="_blank" rel="noopener" title="Opens the card's file in GitHub's editor; changes go through a pull request">{{ icon('edit') }}Edit on GitHub</a></dd></div>{% endif %}
+              {% if card.update_url %}<div><dt>Card</dt><dd class="chip-row"><a class="mini-btn" href="{{ card.update_url }}" target="_blank" rel="noopener" title="Opens a form on GitHub, filled in with this card's content">{{ icon('edit') }}Update</a>{% if card.promote_url %}<a class="mini-btn" href="{{ card.promote_url }}" target="_blank" rel="noopener" title="Turn this idea into a project: opens a form on GitHub, filled in with this card's content">{{ icon('rocket') }}Promote</a>{% endif %}</dd></div>{% endif %}
             </dl>
 
             <nav class="links" aria-label="Links for {{ card.name }}">

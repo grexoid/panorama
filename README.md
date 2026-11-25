@@ -11,7 +11,7 @@ A static, template-driven gallery of **projects** and **use cases**, published o
   - a **use case** is an idea - aspiring work that has not become a project yet. It gets a page of its own on the gallery site, an exposé with the full text, optional figures and the facts at a glance.
 - Hover (or tab to) a card and it pops out of the page from its centre: bigger picture, summary, technologies, metadata and links.
 - Top bar with search plus **Tags**, **Technologies**, **Area** and **Country** filters. A switch shows all cards, only projects or only use cases; projects can also be filtered by status. A country (or a tag or technology) shown on a card is clickable and filters the gallery by it. Filters are reflected in the URL, so a filtered view can be shared.
-- Every card has an **Edit on GitHub** link, and cards can be updated or promoted from idea to project without editing files (see [Updating a card](#updating-a-card)).
+- Every card has an **Update** button, and use cases a **Promote** button that turns an idea into a project: a GitHub form, pre-filled with the card's content, does the work (see [Updating a card](#updating-a-card)).
 - Use cases are **tagged automatically** from their text.
 - Works on phones (tap a card to expand it), in dark and light themes, and without any external requests (no CDN, no web fonts, no tracking).
 
@@ -94,7 +94,7 @@ When the site is built, each use case is scanned for the keywords listed in [`si
 
 The published site is **encrypted**: every page and image is stored encrypted (AES-256-GCM) on GitHub Pages, and visitors see only a password prompt. After the right password is entered, the browser decrypts the pages locally; nothing is sent anywhere. Once unlocked, moving between pages in the same browser tab does not ask again. Closing the tab forgets the unlock.
 
-- **Set the password once:** repository **Settings -> Secrets and variables -> Actions -> New repository secret**, name `GALLERY_PASSWORD`. The **Deploy gallery** workflow reads it, encrypts the site, and *refuses to publish* if the secret is missing. To change the password, change the secret and re-run the workflow (old links keep working with the new password).
+- **Set the password once:** repository **Settings -> Secrets and variables -> Actions -> New repository secret**, name `GALLERY_PASSWORD`. The **Deploy gallery** workflow reads it, encrypts the site, and *refuses to publish* if the secret is missing. To change the password, change the secret and re-run the workflow (old links keep working with the new password; whoever has the site open enters the new password after reloading). The encryption key depends only on the password and the repository, not on the deployment, so a normal update of the site does not ask visitors for the password again, and images that a browser still has from an earlier deployment stay readable.
 - **Local preview:** a plain `python scripts/build.py` builds an unprotected site for your own computer. To try the protected one, set the variable first (PowerShell: `$env:GALLERY_PASSWORD = "test"`; bash: `GALLERY_PASSWORD=test python ...`) and open the result through `python -m http.server`.
 - **Checked automatically:** `scripts/check_protected.py` fails the pull request check if a protected build would contain readable card text, readable images or `projects.json` (which is therefore not published for a protected site).
 
@@ -149,33 +149,39 @@ Files whose name starts with `_` are ignored, which is handy for drafts.
 
 ## Updating a card
 
-Cards change: a project gets a new version, a use case gets a partner, an idea becomes a project. Every card is one file, so updating it works like adding it: through a pull request that is checked automatically. This is the same for **projects and use cases**.
+Cards change: a project gets a new version, a use case gets a partner, an idea becomes a project. The gallery has buttons for exactly that - the same for **projects and use cases**:
 
-| I want to ...                                                      | How                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| change anything on a card (text, tags, links, pictures ...)        | Point at the card in the gallery (or open the use case's page) and click **Edit on GitHub**. Change the file and choose *Create a new branch and start a pull request*. To replace a picture, upload the new file to the card type's `images` folder. |
-| change a few one-line fields (status, version, links, country ...) | **Actions -> Update a card -> Run workflow.** Choose the kind and name of the card and fill in only what changed. A project's `updated_on` is set to today.                                                                           |
-| turn a use case into a project                                     | **Actions -> Promote use case to project -> Run workflow.** Give the use case's name, the project's website and/or repository, and the status.                                                                                          |
-| remove a card                                                      | Delete its file (and its images) in a pull request. The address of a removed use case's page stops working.                                                                                                                        |
+- **Update** - opens a form on GitHub that is already filled in with everything the card says now: name, teaser, links, status, tags ... and for a use case all its sections.
+- **Promote** (use cases only) - opens a form, filled in with the use case, for turning the idea into a project.
 
-Both workflows check the result with the normal site build and push it to a **new branch** (never to `main`). The run's summary page then links to GitHub's pull-request form; the *Validate cards* check runs on that pull request, and merging it updates the site.
+The buttons are in a card's details (point at the card) and, for use cases, in the panel next to the use case's page.
 
-**Promoting** moves `cards/use-cases/<name>.yaml` to `cards/projects/` together with its images. The project description is built from the use case's summary and the start of its "proposed use of AI"; the status defaults to `beta`. Projects are not tagged automatically, so the tags and technologies the use case had are written into the card. The use case's long sections (challenge, scope, conditions ...) have no place on a project card; they stay in the repository history. Please read the new card in the pull request and adjust the description. Going from project back to use case is not automated.
+**How it works**
 
-The same tools run on a computer, for batches or when you prefer a terminal:
+1. Click the button. GitHub opens the form; change what you want in the boxes and press **Submit new issue**.
+   - Leave a box as it is to keep that part of the card. Type a single dash (`-`) to remove a value. Empty boxes are ignored.
+2. A workflow (*Card requests*) applies your change to a copy of the repository, checks that the site still builds, puts the result on a new branch and **replies on the issue** with a link: **Open the pull request**. If something is wrong - a missing address, an invalid value - the reply says what, and nothing is changed.
+3. Open the pull request from that link. The *Validate cards* check runs on it. Merge it, and the site is updated; the issue closes by itself.
+
+Only people with write access to the repository can change cards this way; for anybody else the workflow replies politely and changes nothing. (The repository needs *Issues* enabled, which is the default.)
+
+**Promoting** a use case moves `cards/use-cases/<name>.yaml` to `cards/projects/` together with its images. The form is pre-filled with the project description built from the use case's summary and the start of its "proposed use of AI", and with its tags and technologies - projects are not tagged automatically, so what the use case had (including the automatic tags) is written into the card. Add the project's **website and/or repository** and choose its status (default `beta`). The use case's long sections (challenge, scope, conditions ...) have no place on a project card; they stay in the repository history. Going from project back to use case is not automated.
+
+**Good to know**
+
+- An address on the web has a length limit. If a card has so much text that it does not all fit into the button's address, the longest texts are left out of the form: such a box is empty, which means *the card's text stays as it is*. To replace one of those texts, paste the new text into the empty box.
+- Every card is a single file, so you can also edit it directly on GitHub (the pencil on `cards/projects/<name>.yaml` or `cards/use-cases/<name>.yaml`) and open a pull request. To remove a card, delete its file (and its images) in a pull request; the address of a removed use case's page stops working. Renaming a card means renaming its file; the address of a use case's page changes with it.
+- The buttons only appear on builds that know the repository: GitHub Actions provides it; for a local preview set `repository: owner/name` in [`site/site.yaml`](site/site.yaml).
+- To update a use case that arrived as a *new version of a Word document*, change the card with the Update button rather than importing again: `import_use_case.py --force` would overwrite the hand-written `quip`, `summary`, organisation and country.
+- The forms are defined once, in [`scripts/card_forms.py`](scripts/card_forms.py), and generated into `.github/ISSUE_TEMPLATE/`. After changing them, run `python scripts/card_forms.py --write`; CI checks that the files are up to date.
+
+The same operations are available on a computer, for batches or when you prefer a terminal:
 
 ```bash
 python scripts/update_card.py project my-project status=active version=1.2.0
-python scripts/update_card.py use-case my-idea country=Italy
+python scripts/update_card.py use-case my-idea country=Italy "tags=water, floods"
 python scripts/promote_card.py my-idea --website https://example.org/my-idea --status beta
 ```
-
-Notes:
-
-- *Edit on GitHub* links need to know the repository: GitHub Actions provides it; for a local preview set `repository: owner/name` in [`site/site.yaml`](site/site.yaml).
-- The workflows ask for write access to the repository's contents in their own definition. If your organisation forbids that for Actions, they fail with a permissions message and the command-line tools are the fallback.
-- To update a use case that arrived as a *new version of a Word document*, edit the card rather than importing again: `import_use_case.py --force` would overwrite the hand-written `quip`, `summary`, organisation and country.
-- Renaming a card means renaming its file; the address of a use case's page changes with it.
 
 ## Running locally
 

@@ -51,13 +51,29 @@ def block(key: str, text: str) -> str:
     return f"{key}: |\n" + "\n".join(("  " + line) if line else "" for line in text.split("\n"))
 
 
+def promote_list(given: str | None, fallback: list[str]) -> list[str]:
+    """Tags or technologies: what the person typed (comma separated), else the use case's own."""
+    items = re.split(r"[,\n]", given) if given else fallback
+    seen: dict[str, str] = {}
+    for item in items:
+        label = " ".join(item.split())
+        if label:
+            seen.setdefault(label.casefold(), label)
+    return list(seen.values())
+
+
 def is_local(path: str) -> bool:
     return not re.match(r"[a-z][a-z0-9+.-]*:", path, re.I)
 
 
-def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, today: dt.date | None = None) -> tuple[Path, list[str]]:
-    """Move cards/use-cases/<slug>.yaml to cards/projects/ as a project card. Returns the new file and notes for the user."""
+def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, today: dt.date | None = None,
+            overrides: dict[str, str] | None = None) -> tuple[Path, list[str]]:
+    """Move cards/use-cases/<slug>.yaml to cards/projects/ as a project card. Returns the new file and notes for the user.
+
+    `overrides` replaces what would be taken over from the use case: name, quip, description, tags, stack (lists as
+    comma-separated text), country, affiliation, contact. An empty value counts as "not given"."""
     today = today or dt.date.today()
+    overrides = {k: v.strip() for k, v in (overrides or {}).items() if v and v.strip()}
     if not SLUG.fullmatch(slug):
         raise PromoteError(f"{slug!r} is not a card name: use the file name without .yaml, lowercase letters, digits and dashes only")
     src_dir, dst_dir = cards_root / "use-cases", cards_root / "projects"
@@ -75,11 +91,16 @@ def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, tod
     build.apply_auto_tags([card], build.load_taxonomy(build.ROOT / "site" / "taxonomy.yaml"))
     raw = yaml.safe_load(src.read_text(encoding="utf-8"))
 
-    # --- description: summary + start of "proposed_ai" ---------------------------------------------------
-    proposed = next((s["blocks"] for s in card["sections"] if s["field"] == "proposed_ai"), [])
-    paragraphs = [b["text"] for b in proposed if b["kind"] == "p"]
-    has_summary = bool(build.as_text(raw.get("summary")))
-    description = "\n\n".join(([card["summary"]] if has_summary else []) + paragraphs[: 1 if has_summary else 2]) or card["summary"]
+    # --- what the project card says: the use case's content, unless the person changed it in the form -----
+    description = overrides.get("description") or build.promotion_description(card)
+    description = "\n\n".join(p.strip() for p in re.split(r"\n\s*\n", description.replace("\r\n", "\n")) if p.strip())
+    name = overrides.get("name") or card["name"]
+    quip = overrides.get("quip", card["quip"])
+    tags = promote_list(overrides.get("tags"), [*card["tag_labels"], *card["auto_tags"]])
+    stack = promote_list(overrides.get("stack"), [*card["stack_labels"], *card["auto_stack"]])
+    country = overrides.get("country") or ", ".join(card["country_labels"])
+    affiliation = overrides.get("affiliation") or card["affiliation"]
+    contact = overrides.get("contact") or build.as_text(raw.get("contact"))
 
     # --- images: the first one becomes the project's screenshot; files move along -----------------------
     entries = [e.get("file") or e.get("url") if isinstance(e, dict) else e for e in (raw.get("images") or [])]
@@ -101,10 +122,10 @@ def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, tod
             "# expected outcome, conditions) is not shown on a project card; it stays in the repository history.",
             "# Please review the description, the links and the status.",
             "",
-            f"name: {scalar(card['name'])}",
+            f"name: {scalar(name)}",
         ]
-        if card["quip"]:
-            lines.append(f"quip: {scalar(card['quip'])}")
+        if quip:
+            lines.append(f"quip: {scalar(quip)}")
         lines += ["", block("description", description), ""]
         for field, key in (("website", "website"), ("repo_url", "repo_url"), ("demo_url", "demo_url"), ("docs_url", "docs_url")):
             if links.get(field):
@@ -112,18 +133,18 @@ def promote(slug: str, cards_root: Path, links: dict[str, str], status: str, tod
         if entries:
             lines.append(f"screenshot_url: {scalar(entries[0])}")
         lines += ["", f"category: {scalar(card['area_short'])}"]
-        for key, labels in (("tags", [*card["tag_labels"], *card["auto_tags"]]), ("stack", [*card["stack_labels"], *card["auto_stack"]])):
+        for key, labels in (("tags", tags), ("stack", stack)):
             if labels:
                 lines += [f"{key}:"] + [f"  - {scalar(label)}" for label in labels]
         lines += ["", f"status: {status}"]
         if card["featured"]:
             lines.append("featured: true")
-        if card["affiliation"]:
-            lines.append(f"affiliation: {scalar(card['affiliation'])}")
-        if card["country_labels"]:
-            lines.append(f"country: {scalar(', '.join(card['country_labels']))}")
-        if build.as_text(raw.get("contact")):
-            lines.append(f"contact: {scalar(build.as_text(raw.get('contact')))}")
+        if affiliation:
+            lines.append(f"affiliation: {scalar(affiliation)}")
+        if country:
+            lines.append(f"country: {scalar(country)}")
+        if contact:
+            lines.append(f"contact: {scalar(contact)}")
         lines += ["", f"updated_on: {today.isoformat()}"]
 
         dst_dir.mkdir(parents=True, exist_ok=True)
@@ -168,11 +189,14 @@ def main() -> int:
     parser.add_argument("--docs-url", default="", help="optional: documentation")
     parser.add_argument("--status", default="beta", choices=list(build.STATUSES), help="project status (default: beta)")
     parser.add_argument("--cards", type=Path, default=build.ROOT / "cards", help="the cards folder (default: cards)")
+    for field in ("name", "quip", "description", "tags", "stack", "country", "affiliation", "contact"):
+        parser.add_argument(f"--{field}", default="", help=f"replace the {field} taken over from the use case" + (" (comma separated)" if field in ("tags", "stack") else ""))
     args = parser.parse_args()
 
     links = {"website": args.website.strip(), "repo_url": args.repo_url.strip(), "demo_url": args.demo_url.strip(), "docs_url": args.docs_url.strip()}
+    overrides = {f: getattr(args, f) for f in ("name", "quip", "description", "tags", "stack", "country", "affiliation", "contact")}
     try:
-        target, notes = promote(args.card, args.cards.resolve(), links, args.status)
+        target, notes = promote(args.card, args.cards.resolve(), links, args.status, overrides=overrides)
     except PromoteError as exc:
         print(f"Cannot promote: {exc}")
         return 1
