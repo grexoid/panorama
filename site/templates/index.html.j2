@@ -124,8 +124,8 @@
         {% endif %}
 
         <header class="card-head">
-          {% call visual(card, 'icon') %}
-            {% set tile = card.thumbnail if is_uc else (card.thumbnail or card.screenshot) %}
+          {% set tile = card.thumbnail if is_uc else (card.thumbnail or card.screenshot) %}
+          {% call visual(card, 'icon logo' if card.thumbnail else 'icon', true if tile else false) %}
             {% if tile %}<img src="{{ tile|asset }}" alt="" loading="lazy" decoding="async">{% endif %}
           {% endcall %}
           <div class="titles">
@@ -148,7 +148,7 @@
 
         <div class="more">
           <div class="more-inner">
-            {% call visual(card, 'shot') %}
+            {% call visual(card, 'shot', true if card.cover else false) %}
               {% if card.cover %}<img src="{{ card.cover|asset }}" alt="{{ 'Figure from ' if is_uc else 'Screenshot of ' }}{{ card.name }}" loading="lazy" decoding="async">{% endif %}
               <span class="status s-{{ card.status }}">{{ card.status_label }}</span>
             {% endcall %}

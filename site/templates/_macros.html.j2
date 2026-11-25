@@ -63,9 +63,9 @@
 {% endmacro %}
 
 {# Gradient tile with initials (or a bulb); a <img> passed via call() is layered on top. #}
-{% macro visual(card, cls) %}
-  <span class="{{ cls }}" style="--h:{{ card.hue }}">
-    <span class="initials" aria-hidden="true">{{ card.initials }}</span>
+{% macro visual(card, cls, image=false) %}
+  <span class="{{ cls }}{{ ' has-img' if image }}" style="--h:{{ card.hue }}">
+    {% if not image %}<span class="initials" aria-hidden="true">{{ card.initials }}</span>{% endif %}
     {% if caller is defined %}{{ caller() }}{% endif %}
   </span>
 {% endmacro %}
