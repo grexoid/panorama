@@ -36,8 +36,16 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Build site
-        run: python scripts/build.py --strict
+      # The site is published encrypted. The password is a repository secret (Settings -> Secrets and
+      # variables -> Actions -> GALLERY_PASSWORD); --require-password makes the build fail rather than
+      # ever publishing the gallery unprotected.
+      - name: Build site (password protected)
+        run: python scripts/build.py --strict --require-password
+        env:
+          GALLERY_PASSWORD: ${{ secrets.GALLERY_PASSWORD }}
+
+      - name: Check that nothing readable is published
+        run: python scripts/check_protected.py dist
 
       - uses: actions/configure-pages@v5
 

@@ -1,0 +1,43 @@
+<!doctype html>
+{# The page that is published instead of the real one when the site is password protected.
+   The real page travels inside #payload, encrypted; static/gate.js asks for the password and unlocks it. #}
+<html lang="en" class="no-js" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark light">
+  <title>{{ site.title }} · protected</title>
+  <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ root }}static/style.css?v={{ assets.css }}">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.replace('no-js', 'js');
+      try {
+        var saved = localStorage.getItem('gallery-theme');
+        if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
+      } catch (e) {}
+    })();
+  </script>
+  <script src="{{ root }}static/gate.js?v={{ assets.gate }}" defer></script>
+</head>
+<body class="gate-page">
+  <main class="gate" id="gate">
+    <div class="gate-card">
+      <p class="gate-icon" aria-hidden="true">{{ site.icon }}</p>
+      <h1>{{ site.title }}</h1>
+      <p class="gate-hint">This gallery is protected. Enter the password to continue.</p>
+      <form id="gate-form" autocomplete="off" hidden>
+        <label class="sr-only" for="gate-password">Password</label>
+        <input id="gate-password" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+        <button class="cta" type="submit"><span>Unlock</span></button>
+        <p class="gate-error" id="gate-error" role="alert" hidden></p>
+      </form>
+      <p class="gate-status" id="gate-status" role="status">Loading…</p>
+      <noscript><p class="gate-error">This page needs JavaScript to unlock.</p></noscript>
+    </div>
+  </main>
+  <script id="payload" type="application/json">{{ payload|safe }}</script>
+</body>
+</html>

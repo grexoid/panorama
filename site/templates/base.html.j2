@@ -7,6 +7,7 @@
   {% block meta %}
   {% if site.tagline %}<meta name="description" content="{{ site.tagline }}">{% endif %}
   {% endblock %}
+  {% if encrypted %}<meta name="robots" content="noindex, nofollow">{% endif %}
   <meta name="color-scheme" content="dark light">
   <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="{{ root }}static/style.css?v={{ assets.css }}">
@@ -22,6 +23,7 @@
     })();
   </script>
   <script src="{{ root }}static/app.js?v={{ assets.js }}" defer></script>
+  {% if encrypted %}<script src="{{ root }}static/secure.js?v={{ assets.secure }}" defer></script>{% endif %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
@@ -36,7 +38,7 @@
     built {{ built_on.day }} {{ built_on.strftime('%b %Y') }}
     {% if site.footer %}· {{ site.footer }}{% endif %}
     {% if site.contribute_url %}· <a href="{{ site.contribute_url }}" target="_blank" rel="noopener">Contribute a card</a>{% endif %}
-    · <a href="{{ root }}projects.json">JSON</a>
+    {% if not encrypted %}· <a href="{{ root }}projects.json">JSON</a>{% endif %}
   </p>
 </footer>
 

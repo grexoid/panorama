@@ -8,7 +8,6 @@ on:
       - "cards/**"
       - "resources/templates/**"
       - "resources/examples/**"
-      - "submissions/**"
       - "site/**"
       - "scripts/**"
       - "requirements.txt"
@@ -41,6 +40,14 @@ jobs:
           python scripts/build.py --strict --cards "$RUNNER_TEMP/templates" --out "$RUNNER_TEMP/templates-out"
           python scripts/build.py --strict --cards resources/examples --out "$RUNNER_TEMP/examples-out"
 
-      # The Word importer must keep working on the official template document.
+      # A protected build must not leak any readable card text or image (dummy password, only for this check).
+      - name: Check password protection
+        env:
+          GALLERY_PASSWORD: ci-check-password
+        run: |
+          python scripts/build.py --strict --require-password --out "$RUNNER_TEMP/protected"
+          python scripts/check_protected.py "$RUNNER_TEMP/protected"
+
+      # The Word importer must keep working (the test builds its own tiny Word document).
       - name: Check the Word importer
-        run: python scripts/import_use_case.py submissions/use-cases_template.docx --out "$RUNNER_TEMP/imported" --force
+        run: python scripts/check_importer.py
