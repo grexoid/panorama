@@ -17,6 +17,7 @@
 
   // Broken or missing images fall back to the gradient + initials placeholder underneath.
   const dropBroken = (img) => {
+    if (!img.getAttribute('src')) return;                     // not loaded yet (protected site: secure.js fills it in)
     if (img.complete && img.naturalWidth === 0) (img.closest('.bg') || img).remove();
   };
   document.addEventListener('error', (e) => {

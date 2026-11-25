@@ -1,6 +1,4 @@
-# Draft generated from submissions/use-cases/green_budgeting_risk data_use_case.docx
-# Please review: add a short `quip`, check the text for left-over template hints.
-# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+# Converted from the Word submission "green_budgeting_risk data_use_case.docx" (the original is kept outside this repository).
 
 name: AI-assisted extraction of physical risk data for green budgeting
 quip: Finding the geolocation and asset types hidden in public budgets

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Turn a submitted use-case Word document (.docx) into a draft use-case card.
 
-Colleagues submit use cases as Word documents (submissions/use-cases_template.docx). This script
+Colleagues submit use cases as Word documents (the use-case template). This script
 reads the seven numbered sections, works out the ticked "main area", extracts the embedded
 figures and writes a YAML card to cards/use-cases/ that the gallery build understands.
 
-    python scripts/import_use_case.py submissions/use-cases/some-idea.docx
-    python scripts/import_use_case.py submissions/use-cases/*.docx --force
+    python scripts/import_use_case.py path/to/some-idea.docx
+    python scripts/import_use_case.py path/to/*.docx --force
     python scripts/import_use_case.py my.docx --slug forest-watch --out cards/use-cases
 
 The result is a DRAFT. Please read it through before committing: add a one-line `quip` and,
@@ -322,7 +322,7 @@ def import_docx(path: Path, slug: str, out_dir: Path, force: bool = False, overr
 
     meta = overrides.get("meta", {})     # quip, summary, affiliation, country, ...
     lines = [
-        f"# Draft generated from submissions/use-cases/{path.name}",
+        f"# Draft generated from {path.name}",
         "# Please review: add a short `quip`, check the text for left-over template hints.",
         "# Tags and technologies are added automatically at build time (site/taxonomy.yaml).",
         "",

@@ -13,11 +13,14 @@ and renders ``dist/`` from the Jinja2 templates in ``site/``.
     python scripts/build.py --cards resources/examples --out preview
     python scripts/build.py --strict                 # treat warnings as errors
 
+    GALLERY_PASSWORD=... python scripts/build.py     # encrypt all pages and images (see README, "Password protection")
+
 Exit status is non-zero when any card is invalid, so it doubles as the PR check.
 """
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import hashlib
 import html
@@ -646,18 +649,68 @@ def public_record(card: dict) -> dict:
     return record
 
 
+# --------------------------------------------------------------------------- #
+# Password protection
+# --------------------------------------------------------------------------- #
+PASSWORD_ENV = "GALLERY_PASSWORD"
+PBKDF2_ITERATIONS = 600_000            # OWASP recommendation for PBKDF2-HMAC-SHA256
+MEDIA_REF = re.compile(r'\b(src|href)="((?:\.\./)*media/[^"]+)"')
+
+
+def b64(data: bytes) -> str:
+    return base64.b64encode(data).decode("ascii")
+
+
+class Vault:
+    """AES-256-GCM, with the key stretched from the site password by PBKDF2-HMAC-SHA256.
+
+    The salt is fixed per build, so a browser derives the key once per session and then opens every page and
+    image. Each encrypted blob carries its own random 96-bit IV in front of the ciphertext."""
+
+    def __init__(self, password: str) -> None:
+        try:
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+        except ImportError as exc:  # pragma: no cover
+            raise SystemExit("Password protection needs the 'cryptography' package: pip install -r requirements.txt") from exc
+        self.salt = os.urandom(16)
+        self._aes = AESGCM(hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), self.salt, PBKDF2_ITERATIONS, 32))
+
+    def seal(self, data: bytes) -> bytes:
+        iv = os.urandom(12)
+        return iv + self._aes.encrypt(iv, data, None)
+
+    def payload(self, page: str) -> str:
+        """JSON for the gate page: everything a browser needs, apart from the password."""
+        return json.dumps({"v": 1, "iter": PBKDF2_ITERATIONS, "salt": b64(self.salt), "data": b64(self.seal(page.encode("utf-8")))})
+
+
+def lock_media(page: str) -> str:
+    """Point a page at the encrypted copies of its images; static/secure.js decrypts them in the browser."""
+    return MEDIA_REF.sub(lambda m: f'data-enc-{m.group(1)}="{m.group(2)}.enc"', page)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--cards", type=Path, default=ROOT / "cards", help="root folder with the card folders (default: cards)")
     parser.add_argument("--out", type=Path, default=ROOT / "dist", help="output folder (default: dist)")
     parser.add_argument("--site", type=Path, default=ROOT / "site", help="folder with templates, static files, site.yaml and taxonomy.yaml")
     parser.add_argument("--strict", action="store_true", help="fail on warnings as well as errors")
+    parser.add_argument("--require-password", action="store_true", help=f"fail unless {PASSWORD_ENV} is set (used when deploying)")
     args = parser.parse_args()
 
     cards_root = args.cards.resolve()
     out_dir = args.out.resolve()
     site_dir = args.site.resolve()
     problems = Problems()
+
+    # Password protection is switched on by an environment variable, so the password never lands in the repository.
+    password = os.environ.get(PASSWORD_ENV, "")
+    if args.require_password and not password:
+        print(f"Refusing to build an unprotected site: the environment variable {PASSWORD_ENV} is empty or not set.\n"
+              f"On GitHub: Settings -> Secrets and variables -> Actions -> New repository secret named {PASSWORD_ENV}.")
+        return 1
+    vault = Vault(password) if password else None
+    print(f"Password protection: {'ON - pages and images are encrypted' if vault else 'OFF (set ' + PASSWORD_ENV + ' to switch it on)'}")
 
     # --- read cards ---------------------------------------------------------
     media: dict[str, Path] = {}
@@ -701,7 +754,10 @@ def main() -> int:
     for rel, source in media.items():
         target = out_dir / "media" / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        if vault:                      # only the encrypted copy is published
+            target.with_name(target.name + ".enc").write_bytes(vault.seal(source.read_bytes()))
+        else:
+            shutil.copy2(source, target)
     (out_dir / ".nojekyll").write_text("", encoding="utf-8")
 
     site = load_site_config(site_dir / "site.yaml")
@@ -725,26 +781,35 @@ def main() -> int:
     statuses_present = [s for s in STATUSES if any(c["status"] == s for c in projects)]
     common = {
         "site": site,
-        "assets": {"css": file_hash(site_dir / "static" / "style.css"), "js": file_hash(site_dir / "static" / "app.js")},
+        "assets": {key: file_hash(site_dir / "static" / name) for key, name in
+                   (("css", "style.css"), ("js", "app.js"), ("gate", "gate.js"), ("secure", "secure.js"))},
         "built_on": dt.date.today(),
         "counts": {"all": len(cards), "project": len(projects), "use-case": len(use_cases)},
+        "encrypted": vault is not None,
     }
-    page = env.get_template("index.html.j2").render(
+
+    def publish(path: Path, page: str, root: str) -> None:
+        """Write a page - or, when protected, a small gate page that carries it encrypted."""
+        if vault:
+            page = env.get_template("gate.html.j2").render(**common, root=root, payload=vault.payload(lock_media(page)))
+        path.write_text(page, encoding="utf-8")
+
+    publish(out_dir / "index.html", env.get_template("index.html.j2").render(
         **common, root="", cards=cards,
         facets={"tags": build_facets(cards, "tags"), "stack": build_facets(cards, "stack"), "areas": build_area_facet(cards)},
         statuses=[(s, STATUSES[s]) for s in statuses_present],
-    )
-    (out_dir / "index.html").write_text(page, encoding="utf-8")
+    ), "")
 
     expose = env.get_template("use-case.html.j2")
     for card in use_cases:
         target = out_dir / card["page"]
         target.mkdir(parents=True, exist_ok=True)
-        (target / "index.html").write_text(expose.render(**common, root="../../", card=card, areas=AREAS), encoding="utf-8")
+        publish(target / "index.html", expose.render(**common, root="../../", card=card, areas=AREAS), "../../")
 
-    (out_dir / "projects.json").write_text(
-        json.dumps([public_record(c) for c in cards], indent=2, ensure_ascii=False, default=str), encoding="utf-8"
-    )
+    if not vault:   # the JSON holds every card's full text, so it is not published for a protected site
+        (out_dir / "projects.json").write_text(
+            json.dumps([public_record(c) for c in cards], indent=2, ensure_ascii=False, default=str), encoding="utf-8"
+        )
 
     print(f"\nBuilt {len(projects)} project(s) and {len(use_cases)} use case(s) -> {out_dir}  ({len(problems.warnings)} warning(s))")
     return 0

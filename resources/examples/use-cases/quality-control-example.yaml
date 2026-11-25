@@ -1,5 +1,5 @@
 # Example use-case card, taken from the "intended level of detail" example in the Word
-# template (submissions/use-cases_template.docx). To write your own card, start from
+# template for use cases. To write your own card, start from
 # resources/templates/use-case-card.yaml.
 
 name: AI-assisted quality control of environmental reporting data

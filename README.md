@@ -18,7 +18,6 @@ A static, template-driven gallery of **projects** and **use cases**, published o
 cards/                    <- every card lives below this root
   projects/               <- one .yaml per project (+ images/)
   use-cases/              <- one .yaml per use case (+ images/<card-name>/)
-submissions/              <- the source Word documents of submitted use cases (not published)
 resources/templates/      <- project-card.yaml and use-case-card.yaml: the commented templates to copy
 resources/examples/       <- filled-in and fictional cards for previewing the layout
 site/                     <- site.yaml (title, logo), taxonomy.yaml (automatic tags), Jinja2 templates, CSS, JS
@@ -70,10 +69,10 @@ To add a picture the same way, open the card type's `images` folder, choose **Ad
 
 ### Use cases submitted as Word documents
 
-Use cases are collected with the Word template [`submissions/use-cases_template.docx`](submissions/use-cases_template.docx). Completed documents go to `submissions/use-cases/`. The use-case card has exactly the sections of that template, so a document can be converted almost mechanically:
+Use cases are collected with a Word template. The Word documents themselves are **not** stored in this repository: they can contain personal data, and the card is the published record. The use-case card has exactly the sections of the Word template, so a submitted document can be converted almost mechanically:
 
 ```bash
-python scripts/import_use_case.py "submissions/use-cases/My idea.docx"
+python scripts/import_use_case.py "path/to/My idea.docx"
 ```
 
 The script reads the seven numbered sections, detects the ticked main area (whichever kind of check box was used), converts bullet lists, removes left-over template hints and writes `cards/use-cases/my-idea.yaml`. Figures embedded in the document are extracted next to it, with their "Pic. 1: ..." captions.
@@ -84,11 +83,26 @@ The result is a **draft**. Before committing, read it through and:
 - fill in `affiliation` and `country`;
 - **check every extracted figure** for personal data (e.g. screenshots showing real names) and for third-party copyright (e.g. charts from other organisations), and delete the ones that cannot be published.
 
-Tags need no attention; they are added automatically (next section). The original document stays in `submissions/` as the record of what was submitted.
+Tags need no attention; they are added automatically (next section). Keep the original document outside the repository (the card header names the file it was converted from). `python scripts/check_importer.py` is a self-test of the converter; CI runs it.
 
 ### Automatic tags
 
 When the site is built, each use case is scanned for the keywords listed in [`site/taxonomy.yaml`](site/taxonomy.yaml). A topic that shows up often enough becomes a **tag** (for example "Water and hydrology"), a tool or method becomes a **technology** (for example "MCP"). The file is plain YAML with its own explanation at the top; adjust the vocabulary there, without touching any code. Tags written into a card by hand are kept and shown first; `auto_tag: false` switches the automation off for one card. Projects are not tagged automatically - their authors choose their tags.
+
+### Password protection
+
+The published site is **encrypted**: every page and image is stored encrypted (AES-256-GCM) on GitHub Pages, and visitors see only a password prompt. After the right password is entered, the browser decrypts the pages locally; nothing is sent anywhere. Once unlocked, moving between pages in the same browser tab does not ask again. Closing the tab forgets the unlock.
+
+- **Set the password once:** repository **Settings -> Secrets and variables -> Actions -> New repository secret**, name `GALLERY_PASSWORD`. The **Deploy gallery** workflow reads it, encrypts the site, and *refuses to publish* if the secret is missing. To change the password, change the secret and re-run the workflow (old links keep working with the new password).
+- **Local preview:** a plain `python scripts/build.py` builds an unprotected site for your own computer. To try the protected one, set the variable first (PowerShell: `$env:GALLERY_PASSWORD = "test"`; bash: `GALLERY_PASSWORD=test python ...`) and open the result through `python -m http.server`.
+- **Checked automatically:** `scripts/check_protected.py` fails the pull request check if a protected build would contain readable card text, readable images or `projects.json` (which is therefore not published for a protected site).
+
+What this does **not** do - please read before relying on it:
+
+- It protects the *published website*, not the *repository*. Cards and their images are readable by everyone who can read the repository. If the repository is public, so is everything in it; keep it private (or keep personal data out of it) if names must stay confidential.
+- Anyone who has the password can read everything and share it; there is no per-person login and no way to revoke one person. Rotate the password to lock everybody out.
+- The encrypted files can be downloaded by anyone and attacked offline. The key is stretched (PBKDF2, 600,000 rounds), so a **long passphrase** (for example four or five random words) is strong; a short or common password is not.
+- File names, page addresses (`use-cases/<card-name>/`), the number of cards and the size of images stay visible. Search engines are asked not to index the site.
 
 ### Card fields
 
@@ -156,8 +170,9 @@ Title, logo emoji (also used as favicon), heading, tagline and search placeholde
 
 1. Push this repository to GitHub.
 2. **Settings -> Pages -> Build and deployment -> Source: GitHub Actions**.
-3. Push to `main` (or run **Deploy gallery** manually). The site appears at `https://<owner>.github.io/<repo>/`.
+3. **Settings -> Secrets and variables -> Actions -> New repository secret:** `GALLERY_PASSWORD` (see [Password protection](#password-protection)).
+4. Push to `main` (or run **Deploy gallery** manually). The site appears at `https://<owner>.github.io/<repo>/`.
 
 All asset links are relative, so the site works under the `/<repo>/` sub-path as well as on a custom domain.
 
-The build also writes `projects.json` next to `index.html`, a machine-readable copy of all cards (projects and use cases, including the automatic tags).
+An unprotected local build also writes `projects.json` next to `index.html`, a machine-readable copy of all cards (projects and use cases, including the automatic tags). It is left out of protected builds.

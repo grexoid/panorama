@@ -27,7 +27,7 @@
   --radius: 16px;
   --gap: 20px;
   --gutter: 48px;           /* must stay >= --grow so expanded cards never leave the page */
-  --card-h: 172px;          /* height of a collapsed card (desktop overlay mode) */
+  --card-h: 188px;         /* height of a collapsed card (desktop overlay mode) */
   --grow: 32px;          /* how far an expanded card extends on each side */
   --ease: cubic-bezier(.2, .7, .2, 1);
   --pop: cubic-bezier(.34, 1.45, .64, 1);   /* slight overshoot */
@@ -263,7 +263,7 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 }
 .bg img { width: 100%; height: 100%; object-fit: cover; }
 
-.card-head { display: flex; align-items: flex-start; gap: 12px; }
+.card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }   /* + the card's 12px gap = breathing room above the labels */
 .titles { flex: 1; min-width: 0; }
 .card h2 {
   font-size: 1.08rem; line-height: 1.25; font-weight: 650; letter-spacing: -.01em;
@@ -286,7 +286,8 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 .icon img, .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.card > .chips.tags { max-height: 28px; overflow: hidden; }   /* one row while collapsed */
+/* Labels: one row while collapsed, pinned to the bottom edge of the card (auto margin eats the free space). */
+.card > .chips.tags { max-height: 28px; overflow: hidden; margin-top: auto; }
 .card:is(:hover, .open, :has(:focus-visible)) > .chips.tags { max-height: none; }
 
 .chip {
@@ -306,7 +307,8 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
 .more {
   display: grid; grid-template-rows: 0fr;
   visibility: hidden;
-  transition: grid-template-rows var(--t) var(--ease), visibility 0s var(--t);
+  margin-top: -12px;      /* cancels the card's flex gap while collapsed, so the labels sit flush at the bottom */
+  transition: grid-template-rows var(--t) var(--ease), visibility 0s var(--t), margin-top var(--t) var(--ease);
 }
 .more-inner {
   min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px;
@@ -314,7 +316,7 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   transition: opacity .18s, translate .3s var(--ease);
 }
 
-.card:is(.open, :has(:focus-visible)) .more { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.card:is(.open, :has(:focus-visible)) .more { grid-template-rows: 1fr; visibility: visible; margin-top: 0; transition-delay: 0s; }
 .card:is(.open, :has(:focus-visible)) .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
 .card:is(.open, :has(:focus-visible)) .bg { opacity: .0; }
 
@@ -371,7 +373,7 @@ main { flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 36px va
   .card:hover .quip { -webkit-line-clamp: unset; }
   .card:hover > .chips.tags { max-height: none; }
   .card:hover .bg { opacity: 0; }
-  .card:hover .more { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+  .card:hover .more { grid-template-rows: 1fr; visibility: visible; margin-top: 0; transition-delay: 0s; }
   .card:hover .more-inner { opacity: 1; translate: 0 0; transition-delay: .12s; }
 
   .card:is(:hover, :has(:focus-visible)) {
@@ -428,6 +430,29 @@ code { padding: 1px 6px; border-radius: 6px; background: var(--surface-2); font-
 
 /* Without JS: hide controls that can't work; cards still expand on hover. */
 .no-js .filters, .no-js .segmented, .no-js #theme { display: none; }
+
+/* ==========================================================================
+   Password gate (protected sites only; see static/gate.js)
+   ========================================================================== */
+
+.gate { flex: 1; min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+.gate-card {
+  width: min(420px, 100%); padding: 38px 32px 32px; text-align: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow);
+}
+.gate-icon { margin: 0 0 8px; font-size: 2.8rem; line-height: 1; }
+.gate-card h1 { font-size: 1.4rem; letter-spacing: -.01em; color: var(--accent); }
+.gate-hint, .gate-status { margin: 10px 0 24px; color: var(--muted); font-size: .95rem; }
+#gate-form { display: grid; gap: 12px; }
+#gate-form input {
+  height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text); font: inherit;
+}
+#gate-form input:focus { outline: 0; border-color: var(--accent-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-2) 25%, transparent); }
+#gate-form .cta { width: 100%; height: 46px; justify-content: center; border: 0; cursor: pointer; font: inherit; font-weight: 650; }
+#gate-form .cta:disabled { opacity: .6; cursor: progress; }
+.gate-error { margin: 0; color: #f87171; font-size: .9rem; }
+:root[data-theme="light"] .gate-error { color: #b91c1c; }
 
 /* ==========================================================================
    Use cases
