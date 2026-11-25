@@ -11,7 +11,7 @@ A static, template-driven gallery of **projects** and **use cases**, published o
   - a **use case** is an idea - aspiring work that has not become a project yet. It gets a page of its own on the gallery site, an exposé with the full text, optional figures and the facts at a glance.
 - Hover (or tab to) a card and it pops out of the page from its centre: bigger picture, summary, technologies, metadata and links.
 - Top bar with search plus **Tags**, **Technologies**, **Area** and **Country** filters. A switch shows all cards, only projects or only use cases; projects can also be filtered by status. A country (or a tag or technology) shown on a card is clickable and filters the gallery by it. Filters are reflected in the URL, so a filtered view can be shared.
-- Every card has an **Update** button, and use cases a **Promote** button that turns an idea into a project: a GitHub form, pre-filled with the card's content, does the work (see [Updating a card](#updating-a-card)).
+- Every card has an **Update** button, and use cases a **Promote** button that turns an idea into a project: a GitHub issue, pre-filled with the card's content for you to edit, does the work (see [Updating a card](#updating-a-card)).
 - Use cases are **tagged automatically** from their text.
 - Works on phones (tap a card to expand it), in dark and light themes, and without any external requests (no CDN, no web fonts, no tracking).
 
@@ -151,29 +151,30 @@ Files whose name starts with `_` are ignored, which is handy for drafts.
 
 Cards change: a project gets a new version, a use case gets a partner, an idea becomes a project. The gallery has buttons for exactly that - the same for **projects and use cases**:
 
-- **Update** - opens a form on GitHub that is already filled in with everything the card says now: name, teaser, links, status, tags ... and for a use case all its sections.
-- **Promote** (use cases only) - opens a form, filled in with the use case, for turning the idea into a project.
+- **Update** - opens a new GitHub issue whose text is already filled in with everything the card says now: name, teaser, links, status, tags ... and for a use case all its sections.
+- **Promote** (use cases only) - opens a new issue, filled in with the use case, for turning the idea into a project.
 
 The buttons are in a card's details (point at the card) and, for use cases, in the panel next to the use case's page.
 
 **How it works**
 
-1. Click the button. GitHub opens the form; change what you want in the boxes and press **Submit new issue**.
-   - Leave a box as it is to keep that part of the card. Type a single dash (`-`) to remove a value. Empty boxes are ignored.
+1. Click the button. GitHub opens a new issue; its text has a `###` heading per field with the card's current value below it. Edit the text under the headings you want to change and press **Create**.
+   - Leave a section as it is to keep that part of the card. Type a single dash (`-`) to remove a value. Empty sections are ignored. Where a field has a fixed set of choices (status, main area), the note under its heading lists them. Please keep the `###` headings as they are.
 2. A workflow (*Card requests*) applies your change to a copy of the repository, checks that the site still builds, puts the result on a new branch and **replies on the issue** with a link: **Open the pull request**. If something is wrong - a missing address, an invalid value - the reply says what, and nothing is changed.
 3. Open the pull request from that link. The *Validate cards* check runs on it. Merge it, and the site is updated; the issue closes by itself.
 
-Only people with write access to the repository can change cards this way; for anybody else the workflow replies politely and changes nothing. (The repository needs *Issues* enabled, which is the default.)
+Only people with write access to the repository can change cards this way; for anybody else the workflow replies politely and changes nothing. (The repository needs *Issues* enabled and blank issues allowed, which is the default.)
 
-**Promoting** a use case moves `cards/use-cases/<name>.yaml` to `cards/projects/` together with its images. The form is pre-filled with the project description built from the use case's summary and the start of its "proposed use of AI", and with its tags and technologies - projects are not tagged automatically, so what the use case had (including the automatic tags) is written into the card. Add the project's **website and/or repository** and choose its status (default `beta`). The use case's long sections (challenge, scope, conditions ...) have no place on a project card; they stay in the repository history. Going from project back to use case is not automated.
+**Promoting** a use case moves `cards/use-cases/<name>.yaml` to `cards/projects/` together with its images. The text is pre-filled with the project description built from the use case's summary and the start of its "proposed use of AI", and with its tags and technologies - projects are not tagged automatically, so what the use case had (including the automatic tags) is written into the card. Add the project's **website and/or repository** and choose its status (default `beta`). The use case's long sections (challenge, scope, conditions ...) have no place on a project card; they stay in the repository history. Going from project back to use case is not automated.
 
 **Good to know**
 
-- An address on the web has a length limit. If a card has so much text that it does not all fit into the button's address, the longest texts are left out of the form: such a box is empty, which means *the card's text stays as it is*. To replace one of those texts, paste the new text into the empty box.
+- An address on the web has a length limit. If a card has so much text that it does not all fit into the button's address, the longest texts are left out of the issue text; such a section is marked and empty, which means *the card's text stays as it is*. To replace one of those texts, write the new text under its heading.
+- GitHub remembers unsaved issue text for the browser tab it was typed in. The buttons open a **new tab**, so you normally start clean; if you ever see an older text instead of the card's, close the tab and click the button in the gallery again.
 - Every card is a single file, so you can also edit it directly on GitHub (the pencil on `cards/projects/<name>.yaml` or `cards/use-cases/<name>.yaml`) and open a pull request. To remove a card, delete its file (and its images) in a pull request; the address of a removed use case's page stops working. Renaming a card means renaming its file; the address of a use case's page changes with it.
 - The buttons only appear on builds that know the repository: GitHub Actions provides it; for a local preview set `repository: owner/name` in [`site/site.yaml`](site/site.yaml).
 - To update a use case that arrived as a *new version of a Word document*, change the card with the Update button rather than importing again: `import_use_case.py --force` would overwrite the hand-written `quip`, `summary`, organisation and country.
-- The forms are defined once, in [`scripts/card_forms.py`](scripts/card_forms.py), and generated into `.github/ISSUE_TEMPLATE/`. After changing them, run `python scripts/card_forms.py --write`; CI checks that the files are up to date.
+- The requests are defined once, in [`scripts/card_forms.py`](scripts/card_forms.py): the headings, the text a button pre-fills, and the reader that the workflow uses. (GitHub's structured issue *forms* are deliberately not used: they lock pre-filled boxes, so nothing could be edited.)
 
 The same operations are available on a computer, for batches or when you prefer a terminal:
 
