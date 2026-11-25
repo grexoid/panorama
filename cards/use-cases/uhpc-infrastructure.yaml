@@ -1,0 +1,68 @@
+# Draft generated from submissions/use-cases/HPC_AI Lab Germany.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Shared µHPC infrastructure for environmental research and AI
+quip: In-house GPU computing for the German environment agencies
+summary: |
+  A browser-accessible micro-HPC system with 32 NVIDIA H200 GPUs and an internal LLM service
+  gives the four agencies of the German environment portfolio their own capacity for
+  data-intensive and AI workloads.
+
+main_area: Data, Technologies and Infrastructure
+affiliation: KI-Lab, German environment portfolio
+country: Germany
+
+challenge: |
+  Work across the German environment portfolio is highly data-intensive (remote sensing,
+  bio- and chemoinformatics, modelling, language models), but no compute infrastructure for
+  scientific and AI workloads was centrally available. Research groups depended on external
+  systems, which kept workflows non-reusable and methodological competence outside the
+  administration.
+
+proposed_ai: |
+  The AI Lab operates a µHPC system as enabling infrastructure: 4 nodes with 256 CPU cores,
+  8 NVIDIA H200 GPUs and 3 TB RAM each (32 GPUs in total), plus 500 TB NVMe storage. Access
+  is browser-based via Open OnDemand (JupyterLab, RStudio, QGIS, SLURM), so no specialised
+  client setup is needed. An internal LLM inference service based on the open-source SAIA
+  framework (GWDG) is being added, usable inside the environment and via API.
+
+scope: |
+  - Externally hosted µHPC with five-year support, operated by the KI-Lab for the four
+    agencies of the German environment portfolio (UBA, BfN, BfS, BASE).
+  - Three usage patterns: individual data science, shared group workspaces with TB-scale
+    data pools, and application hosting with API access.
+  - Phased rollout within that portfolio: KI-Lab and early adopters → German Environment
+    Agency → BfN, BfS, BASE; accompanied by a community of practice and how-to formats.
+  - Out of scope: data with high protection requirements (not yet cleared), the ministry
+    as a direct user group, replacement of existing specialist IT.
+
+expected_outcome: |
+  Researchers and analysts run data- and GPU-intensive work in-house instead of on external
+  systems, with reusable workflows and shared documentation. Success would be shown by a
+  stable service, a growing number of active user groups across the four agencies,
+  documented reference use cases, and an internal LLM service used by other applications.
+
+environmental_contribution: |
+  The system strengthens the evidence base for environmental monitoring and policy advice by
+  making large-scale geodata processing, modelling and in-silico methods available in-house
+
+digital_contribution: |
+  It supports the digital agenda through secure, reusable infrastructure and by building AI
+  capabilities inside the administration rather than buying them in. Energy measurement and
+  sustainable data centre operation are part of the design, making the footprint of AI use
+  measurable.
+
+conditions: |
+  - Identity and access: use requires an account in the German portfolio identity
+    management (currently a lab-internal IDM, Authentik); connection to the agency
+    identity system and a portfolio-wide SSO (Keycloak) is open and a precondition for
+    phase 3.
+  - Data protection: protection level of processed data to be defined; specially protected
+    data not yet cleared.
+  - Skills and support: uptake depends on enablement formats and on support capacity held
+    by a small team.
+  - Continuity: the KI-Lab is funded until the end of 2029; operation beyond that is
+    unsettled.
+  - Reuse: what is transferable across Eionet is the architecture, configuration and
+    operating experience (Open OnDemand, SLURM, SAIA), not compute capacity.

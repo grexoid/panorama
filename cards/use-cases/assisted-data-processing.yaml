@@ -1,0 +1,122 @@
+# Draft generated from submissions/use-cases/Assisted_data_processing_AI_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: AI-assisted automation for environmental data processing
+quip: AI co-developers for environmental data pipelines
+summary: |
+  Code assistants in the developer's IDE and multi-step AI agents help data engineers build,
+  test and maintain the pipelines that collect, harmonise and report environmental data,
+  cutting delivery times from days to hours.
+
+main_area: Data, Technologies and Infrastructure
+
+challenge: |
+  Producing environmental databases or reports for bodies such as Eurostat or the European
+  Environment Agency (EEA) entails the systematic collection, aggregation, harmonization,
+  and reporting of data from a multitude of heterogeneous sources. These sources include
+  national statistical registers, sectoral databases, survey datasets, open data portals,
+  and third-party APIs, each with its own constraints regarding structure, frequency,
+  format, and quality.
+
+  Although the methodology is often well-established and relatively stable, the engineering
+  effort required to develop and maintain the corresponding automation applications remains
+  substantial: development is time-consuming, maintenance costs may be high, and there are
+  risks associated with skill concentration (when expertise regarding a specific pipeline
+  relies on a single analyst, creating a potential point of vulnerability in knowledge
+  transfer).
+
+  The opportunity lies in leveraging AI-assisted software development to significantly
+  shorten the design-to-deployment cycle and improve both the overall quality and the
+  maintainability of the source code.
+
+proposed_ai: |
+  AI models and agents, particularly large language models (LLMs) with robust
+  code-generation capabilities, are reaching a level of proficiency where they serve as
+  highly effective co-developers for data engineering tasks. The proposed use case leverages
+  this capability in two complementary ways:
+
+  - interactive AI assistant integrated directly into the developer's Integrated
+    Development Environment (IDE) to support the engineer throughout the software
+    development lifecycle (code generation, debugging, documentation, testing and
+    knowledge transfer);
+  - AI agent capable of executing a multi-step workflow with minimal human intervention
+    (developing applications from scratch, incrementally adding features).
+
+scope: |
+  This use case covers AI-assisted design, implementation, and maintenance of the following
+  categories of environmental data processing:
+
+  - code for the automated collection of data from multiple external environmental sources
+    (files, databases, APIs);
+  - code for the automated processing of this data (optimization, formatting, aggregation,
+    potential enrichment, metric calculation);
+  - code for the automated conversion of processed data into a format intended for a
+    specific use (reporting, downstream processing, publication, etc.).
+
+expected_outcome: |
+  Accelerated delivery cycles, achieved by reducing the time required to develop new scripts
+  or applications, as well as the time needed to implement new data source adapters or
+  indicator calculations (potentially cutting the timeframe from several days to hours).
+
+  Improved code quality and maintainability, resulting from a more consistent coding style,
+  comprehensive documentation, a suite of automated unit tests integrated into every
+  pipeline, and easier onboarding for new team members, as the AI assistant can explain and
+  extend existing code.
+
+  Reduced manual error rates for the subject matter expert, virtually eliminating
+  transcription mistakes, column-mapping errors, and unit conversion errors which typically
+  arise from manual entry or copy-pasting.
+
+environmental_contribution: |
+  Reliable and up-to-date environmental statistics, achieved by accelerating the production
+  cycle and reducing errors (it can help the timely transmission of environmental reports to
+  Eurostat and the EEA for example).
+
+  This use case can reduce the resources used in the production process, thanks to faster
+  iterations and fewer manual handling
+
+  Expanded data coverage: the lower cost of adding new sources can encourage the integration
+  of more precise and novel datasets, thereby enriching the environmental evidence base.
+
+digital_contribution: |
+  This use case complies with a vision of a data-driven public administration, where AI acts
+  as a productivity driver rather than a substitute for human expertise.
+
+  By integrating AI tools into the daily workflows of statisticians and data engineers, the
+  organization builds its internal AI capabilities.
+
+  Standardized, AI-assisted processing pipelines generate outputs in open, machine-readable
+  formats, facilitating reuse (scalability and interoperability).
+
+conditions: |
+  Most mainstream IDEs now offer extensions (official or community-developed) that allow
+  connections to LLM endpoints. The selected toolchain must support the languages and
+  frameworks used (Python, SQL, R, etc.) by the staff. When deploying autonomous agents, a
+  containerized or isolated (sandboxed) execution environment is required to safely test
+  generated code without impacting production systems.
+
+  AI-generated code must be integrated into the organization's Git repository and meet
+  established continuous integration checks (static analysis/linting, unit tests, security
+  scans), just like human-written code.
+
+  No sensitive information in prompts: any code or data snippet included in a conversation
+  with a hosted LLM must be sanitized in accordance with the EU General Data Protection
+  Regulation (GDPR) and the institution's internal data protection policies.
+
+  LLM inference (particularly for long contexts or multi-step agent workflows) incurs high
+  costs, billed per token or per request. Using smaller models for routine tasks and
+  open-weight models hosted on internal GPU infrastructure helps optimize costs and improve
+  sobriety.
+
+  In all cases, a qualified data engineer reviews and validates AI-generated or AI-assisted
+  code. The human developer reviewing and approving the code retains full responsibility for
+  its accuracy and compliance; the AI output serves as a draft rather than a final
+  deliverable.
+
+  Additionally, a subject matter expert tests each output before the application is deployed
+  to the production environment.
+
+images:
+  - file: images/assisted-data-processing/figure-1.png
+    caption: "Typical technical infrastructure: an AI coding assistant and agent working against a self-hosted model, with human review, version control and acceptance tests"

@@ -1,0 +1,104 @@
+# Draft generated from submissions/use-cases/ENVAI_AI_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: ENVAI – responsible AI support for environmental administration
+quip: One shared AI platform for the Slovak environmental sector
+summary: |
+  A shared framework, register and MLOps platform for AI-assisted analysis of environmental
+  data and documents, replacing isolated pilots across the Ministry of Environment of the
+  Slovak Republic and its sectoral organisations.
+
+main_area: AI Applications and Value Creation
+affiliation: Ministry of Environment of the Slovak Republic (MŽP SR)
+country: Slovakia
+
+challenge: |
+  AI capabilities across the Ministry of Environment of the Slovak Republic (MŽP SR) and its
+  sectoral organisations are currently developed through isolated pilots, with manual
+  preparation of data and models and no shared register, governance framework or operational
+  environment. This results in repeated project effort, deployment cycles often exceeding 12
+  months, limited reuse and inconsistent visibility of risks and performance. Staff
+  responsible for environmental information, permitting, reporting and ICT therefore lack
+  systematic AI support for handling large volumes of documents and heterogeneous data.
+  Addressing this gap is important to improve the quality and speed of environmental
+  services and evidence-based decisions while ensuring compliance and human oversight.
+
+proposed_ai: |
+  ENVAI would provide a shared framework and platform for AI-assisted analysis of
+  environmental data and documents across existing processes and services. AI would support
+  intelligent search, classification and routing of submissions, information extraction and
+  summarisation of EIA/SEA, Integrated Pollution Prevention and Control (IPPC) and other
+  materials, anomaly detection in measurements and spatial data, data-quality control,
+  language services, and detection of environmental changes that may warrant expert review.
+  Staff would access these capabilities through existing sectoral systems and services
+  integrated with ENVAI, while reusable MLOps services would support controlled testing,
+  deployment and monitoring. Competent employees would validate outputs and retain
+  responsibility for every administrative or enforcement decision; ENVAI would not make
+  autonomous decisions in administrative proceedings.
+
+scope: |
+  - Processes and users: the cross-cutting ENVAI process supporting processes P1–P9 (from
+    proposal of the MZP SR ICT strategy) and services S1–S9; principal users are MŽP SR,
+    the Slovak Environment Agency (SAŽP) and other sectoral organisations, with the public
+    benefiting indirectly through improved services.
+  - Information: environmental and spatial data, measurements, submissions, administrative
+    and technical documents, validation rules, training and reference datasets, model
+    artefacts, metrics and audit records.
+  - Coverage: environmental administration and ICT activities across the Slovak
+    environmental sector, with capabilities integrated into existing and foreseen
+    information systems, documented APIs, the sectoral data catalogue and Information
+    Technology Service Management (ITSM).
+  - Outside scope: autonomous decisions in administrative proceedings, replacement of
+    expert judgement, or creation of a separate public-facing service; initial deployment
+    will prioritise approved use cases and data for which access, quality and legal
+    conditions have been confirmed.
+
+expected_outcome: |
+  ENVAI is expected to shorten the path from an approved AI use case to a validated pilot
+  from more than 12 months to approximately six months, while enabling reusable and
+  consistently governed AI assistance across environmental processes. Users should gain
+  faster access to relevant knowledge, more focused review of documents and data, and
+  earlier identification of anomalies or environmental changes. Success would be
+  demonstrated by a functioning use-case and model register by Q1 2029, an operational ENVAI
+  platform by Q1 2030, and deployed AI assistance in existing services by Q4 2030, alongside
+  monitored quality, user uptake and measurable process benefits, based on available
+  resources.
+
+contribution: |
+  ENVAI supports the environmental agenda by improving access to environmental knowledge and
+  strengthening the timeliness and quality of evidence used for monitoring, assessment,
+  permitting and policy implementation. Its analytical capabilities can help identify
+  anomalies in measurements and spatial data, summarise complex environmental documentation
+  and detect changes such as land-cover change or potential illegal dumping for expert
+  follow-up. It supports the digital agenda through responsible automation, reusable AI
+  services, stronger data governance and integration of existing services through secure,
+  documented interfaces. A common register, MLOps environment, monitoring and
+  human-oversight framework will build institutional AI capability while supporting
+  transparent, scalable and trustworthy use of AI.
+
+conditions: |
+  - Data must be suitable, representative, legally accessible and traceable; ownership,
+    quality responsibilities and provenance for training and reference datasets must be
+    defined.
+  - Each use case must be assessed and documented under relevant EU policy framework
+    (e.g.Regulation (EU) 2024/1689, GDPR), Slovak ICT and cybersecurity requirements,
+    including its risk classification and purpose limitations.
+  - Sensitive information must remain in controlled sectoral or private government-cloud
+    environments, supported by access control, anonymisation or pseudonymisation,
+    environment separation, logging and audit records.
+  - Outputs must be sufficiently transparent for expert validation. Human oversight and
+    responsibility for administrative, enforcement and policy decisions must remain
+    explicit, with a practical fallback to non-AI workflows.
+  - The platform depends on integration with existing and foreseen integration systems,
+    source information systems, the sectoral data catalogue, ITSM and REST/OpenAPI
+    interfaces, as well as scalable compute, storage and model monitoring.
+  - MŽP SR and participating organisations need sustained internal capacity in data
+    governance, environmental expertise, AI risk management, model evaluation, MLOps,
+    security and procurement, supported where necessary by external specialists.
+  - Pilots should define measurable baselines for accuracy, false positives, processing
+    time, expert effort, user satisfaction and environmental or service benefit; models
+    should be monitored for performance degradation and drift.
+  - Reuse should be designed into shared components and governance, while compute demand
+    and energy use should be measured and proportionate to the expected environmental and
+    public-service benefit.

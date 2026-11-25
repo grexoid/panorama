@@ -1,0 +1,168 @@
+# Draft generated from submissions/use-cases/Perseus_AI_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Perseus
+quip: Turning document chaos into structured, searchable knowledge
+summary: |
+  Perseus uses a local AI model to read documents and e-mails and turn them into structured
+  knowledge – risks, tasks, events and decisions – for a shared agenda, while sensitive data
+  stays on local infrastructure.
+
+main_area: AI Applications and Value Creation
+
+challenge: |
+  There are a few major common problems across many organisations:
+
+  - how to store and share knowledge
+  - how to manage and handle risks
+  - how to quickly get context about a specific issue
+  - how to learn from previous errors or successes
+
+  In everyday life in an organisation, a lot of data is processed from different sources.
+  Emails, documents, events, reports, etc. This information is not stored as structured and
+  organised data. It stays in email clients, on laptop disks, in the cloud, etc., and:
+
+  - context is lost
+  - information is fragmented
+  - knowledge is not accessible
+  - decisions are not related to issues
+
+  In short:
+
+  - To handle issues and make good decisions, you need to learn from previous bad or good
+    decisions.
+  - To learn from the past, you need to have knowledge with the whole context.
+  - To have knowledge, you need to have structured and organised data.
+  - To have structured and organised data, you need a tool which can turn unstructured
+    document chaos into structured, searchable knowledge that the whole team can rely on.
+    This is the challenge.
+  - For data processing, you can use people, but that is a waste of human potential. Or
+    you can use AI. This is the opportunity.
+
+proposed_ai: |
+  Resource -> LOCAL AI MODEL -> structured data -> organised knowledge
+
+  AI could handle the time-consuming task of reading and analysing large volumes of
+  documents, extracting summaries, identifying risks and categorising content automatically.
+  It would process unstructured information such as PDFs and emails and turn it into
+  structured, actionable knowledge.
+
+  But this data often contains very sensitive information. This is also the most important
+  part of the solution: the LOCAL AI MODEL. In the future, there will be a strong demand for
+  solutions which are 100% local-based, where the processed data is accessible only within
+  the local infrastructure.
+
+scope: |
+  - Process covered: uploading and AI-processing of documents, extracting risks, tasks,
+    events, summaries and knowledge items, and maintaining a shared agenda knowledge base.
+  - Main users: project managers, agenda owners, team members and workspace
+    administrators.
+  - Data involved: uploaded files such as PDFs, Word documents and spreadsheets, raw text,
+    e-mails and AI-generated outputs such as summaries and risk assessments. Structured
+    data is stored in JSON format, in a vector database (ChromaDB) and a relational
+    database (PostgreSQL).
+  - Out of scope: autonomous decision-making, video and audio media processing, media
+    generation.
+
+expected_outcome: |
+  Perseus is running in a testing phase and is currently used only by a very small group of
+  users. It is already producing some results, but the expected final outcomes are more
+  ambitious.
+
+  There are many more areas for improvement, such as HR management, security, financial
+  management and physical resource management. The following are the most important:
+
+  Risks management:
+
+  AS IS:
+
+  - can identify risks from sources using AI
+  - can generate risk matrix
+  - can manage risk mitigation
+
+  EXPECTED:
+
+  - can learn from previous risks and suggest the best solution
+  - can suggest probability and impact according to the context
+  - can identify experts and required skills to handle risks
+
+  Decision making:
+
+  AS IS:
+
+  - can store decisions with a relation to risks and tasks
+  - can provide context of decision
+  - can store decision metadata, including the decision maker and the decision
+
+  EXPECTED:
+
+  - can learn from previous decisions and suggest the best decision
+  - can identify similar previous decisions and suggest improvements
+
+  Knowledge:
+
+  AS IS:
+
+  - can store structured data about resources
+  - can store files with relations to risks, tasks, events and decisions
+  - can identify risks, tasks, events, people and organisations from resources
+  - can generate agenda report
+  - can generate actors activity reports
+  - can generate materials for meetings
+  - can identify critical tasks and risks
+  - can generate a multilevel view for top management – risks, running processes, tasks,
+    HR data and financial data
+
+  EXPECTED:
+
+  - interactive chat based on ChromaDB data
+  - More detailed and accurate reports
+  - a wide range of possible processing resources and MCP servers over the local
+    infrastructure
+
+  Process management:
+
+  AS IS:
+
+  - can manage 3 basic processes
+
+  EXPECTED:
+
+  - covering most used processes in the organisation
+  - admin area for defining new processes
+  - storing process development and history
+  - learning from process history
+  - identifying possible process improvements
+
+contribution: |
+  Perseus can help environmental organisations to process and use information from
+  environmental documents, reports and assessments. It can make relevant information easier
+  to find and use when preparing materials and making decisions.
+
+  On the digital side, Perseus helps automate routine work while keeping people in control
+  of the results. It improves knowledge sharing, data accessibility and cooperation across
+  organisational units. It also helps build practical AI skills inside public and
+  environmental organisations.
+
+conditions: |
+  - Data quality and availability: the system is only as good as the documents provided to
+    it. Incomplete, poorly structured or outdated information can lead to unreliable AI
+    outputs.
+  - Privacy and security: documents processed by Perseus may contain sensitive or
+    confidential information. Access to the data must therefore be properly controlled and
+    data ownership must be clearly defined.
+  - Responsible AI and human oversight: AI-generated risks and summaries must be reviewed
+    by qualified people. AI output should support people, not replace their judgement.
+  - Regulatory compliance: depending on the organisation, AI-assisted document processing
+    may need to comply with GDPR and other regulations related to data handling and
+    automated decision-making.
+  - Technical infrastructure: Perseus depends on several services running at the same time
+    – the Symfony API, Python processor, llama server and ChromaDB. This makes reliability
+    and maintenance important.
+  - Skills and capacity: staff need sufficient digital skills to use the system
+    effectively and to critically evaluate AI outputs.
+
+images:
+  - file: images/perseus/figure-1.png
+    caption: "Current working Perseus schema: how an uploaded source is processed asynchronously and turned into knowledge items, risks and labels"

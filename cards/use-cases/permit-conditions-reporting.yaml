@@ -1,0 +1,68 @@
+# Draft generated from submissions/use-cases/Environmental_reporting_use_case.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Structuring environmental permits for digital reporting
+quip: From permit PDFs to machine-readable reporting requirements
+summary: |
+  AI extracts and structures the conditions of environmental permits, which exist only as
+  non-machine-readable PDFs, so that a new digital reporting system can tailor reporting to
+  each facility and support automated compliance checks.
+
+main_area: AI Applications and Value Creation
+affiliation: Swedish Environmental Protection Agency
+country: Sweden
+
+challenge: |
+  A key challenge is that environmental permit conditions are contained in extensive and
+  complex legal documents, usually in the form of non-machine-readable PDFs that vary in
+  structure and language. This results in substantial manual interpretation and processing
+  for both operators submitting reports and supervisory authorities assessing compliance.
+
+  One objective is therefore to convert relevant permit information into a sufficiently
+  structured format to support digital reporting and data sharing, while maintaining
+  quality, traceability and legal reliability.
+
+proposed_ai: |
+  AI would support the extraction and structuring of information from environmental permits
+  and environmental reports, including identifying the permit conditions that apply to each
+  regulated facility. The structured information could be used to adapt reporting questions
+  and requirements to the facility’s actual permit conditions and to support automated
+  compliance checks.
+
+scope: |
+  - Extraction and structuring of information from environmental permits and reports for
+    use in the future digital environmental reporting system.
+  - Main users and stakeholders: Operators, supervisory authorities and the Swedish
+    Environmental Protection Agency.
+  - Data involved: Permit conditions, reporting requirements and reported information.
+
+expected_outcome: |
+  Operators and supervisory authorities could access and use the resulting information
+  through the future digital environmental reporting system.
+
+  For operators, it would make environmental reporting easier and less time-consuming by
+  adapting the reporting requirements to the permit conditions applying to each facility
+
+  For supervisory authorities, it would enable more efficient compliance checks and
+  follow-up
+
+environmental_contribution: |
+  This use case can help improve environmental reporting and regulatory oversight in Sweden.
+  By making permit conditions and reported environmental information more accessible,
+  structured and suitable for analysis, it can open up new possibilities for improving
+  assessments of environmental impacts and compliance with permit conditions.
+
+digital_contribution: |
+  If successful, the use case can improve data quality and interoperability and support more
+  user-friendly digital services. It can also contribute to the development of responsible
+  and trustworthy AI in the public sector by increasing transparency for both public
+  authorities and the general public.
+
+conditions: |
+  - Access to representative environmental permits and reports, together with clearly
+    defined quality requirements
+  - Human validation to verify the accuracy and legal interpretation of the extracted
+    information.
+  - The extracted data should be structured in a way that enables reuse for other purposes
+    and future needs.

@@ -1,0 +1,221 @@
+# =============================================================================
+#  AUTOMATIC TAGGING OF USE CASES
+# =============================================================================
+#  Every time the site is built, each use case is scanned for the keywords below.
+#  A topic becomes a TAG of the card, a tool or method becomes a TECHNOLOGY, when its
+#  keywords show up often enough. You never have to tag a use case by hand - but anything
+#  you do write under `tags:` or `stack:` in a card is kept and shown first.
+#
+#  HOW TO EDIT THIS FILE
+#   - The name before the colon is what visitors see on the card and in the filters.
+#   - Below it, list the words or phrases that point to that topic. Upper/lower case is
+#     ignored ("Soil" = "soil"), and a hyphen matches a space ("land-cover" = "land cover").
+#   - A star matches any word ending: "hydrolog*" finds hydrology, hydrological, hydrologist.
+#   - Short ALL-CAPS abbreviations (RAG, EIA, GIS) only match in capitals, so "rag" or "sea"
+#     in everyday text is not mistaken for them.
+#   - Optional `min:` raises (or lowers) how strongly a topic must appear before it is used.
+#     Use it for broad words that appear in almost every submission.
+#   - To stop automatic tagging for one card, add `auto_tag: false` to that card.
+#
+#  HOW THE SCORE WORKS
+#   Each keyword counts once per mention in the text (at most 3), and 3 extra points when it is
+#   in the title, short line or summary. A topic is used when its score reaches `min_score`.
+# =============================================================================
+
+settings:
+  min_score: 3                # default threshold for topics
+  min_score_technologies: 2   # default threshold for technologies
+  max_tags: 6                 # at most this many automatic tags per card
+  max_technologies: 5         # ... and this many technologies
+
+# -----------------------------------------------------------------------------
+#  TOPICS  ->  tags
+# -----------------------------------------------------------------------------
+tags:
+  Nature restoration:
+    - nature restoration
+    - restoration plan*
+    - habitat*
+  Biodiversity:
+    - biodiversity
+    - species
+    - wildlife
+  Water and hydrology:
+    - hydrolog*
+    - discharge
+    - waterinfo
+    - flood*
+    - drought
+    - rainfall
+    - water level*
+  Soil and land take:
+    - soil
+    - land take
+    - sealing
+  Land use and land cover:
+    - land cover
+    - land use
+  Climate:
+    keywords: [climate, climate-proofing, adaptation]
+    min: 4
+  Energy transition:
+    - energy transition
+    - wind turbine*
+    - renewable*
+  Remote sensing:
+    - satellite*
+    - remote sensing
+    - earth observation
+    - PlanetScope
+    - imagery
+  Geospatial:
+    - GIS
+    - geospatial
+    - geolocation
+    - spatial
+    - QGIS
+  Environmental reporting:
+    - reporting
+    - reporter*
+    - dataflow*
+    - ReportNet
+  Environmental assessment:
+    - EIA
+    - SEA
+    - impact assessment
+    - environmental assessment*
+    - permit*
+  Compliance and permitting:
+    - compliance
+    - permit*
+    - supervisory
+  Data quality:
+    - data quality
+    - anomal*
+    - quality control
+    - validation
+  Data processing:
+    - data processing
+    - data engineering
+    - pipeline*
+    - ETL
+  Knowledge management:
+    keywords: [knowledge base, knowledge management, knowledge item*, knowledge framework*, knowledge]
+    min: 4
+  Document analysis:
+    - document analysis
+    - information extraction
+    - extract*
+    - summaris*
+    - summariz*
+  Chatbots and assistants:
+    - chatbot*
+    - assistant*
+    - helpdesk
+    - question-answering
+  Search and retrieval:
+    - semantic search
+    - retrieval
+    - RAG
+  Public administration:
+    - public administration
+    - public sector
+    - ministry
+    - administrative
+  Governance and strategy:
+    keywords: [governance, strategy, strategic framework, guidelines]
+    min: 4
+  Skills and training:
+    - training
+    - onboarding
+    - literacy
+    - upskill*
+    - capacity building
+    - skills
+  Computing infrastructure:
+    - HPC
+    - GPU*
+    - supercomputer*
+    - high-performance
+    - computing power
+    - computing infrastructure
+  Green budgeting:
+    - green budgeting
+    - public budget*
+    - financial risk
+    - fiscal
+  Risk management:
+    - risk management
+    - risk assessment*
+    - risks
+  Responsible AI:
+    keywords: [responsible AI, trustworthy AI, AI Act, ethic*, explainab*]
+    min: 4
+  Natural-language access:
+    - natural language
+    - plain-language
+    - conversational
+  Digital sovereignty:
+    - in-house
+    - sovereign*
+    - local AI
+    - local model*
+    - open-weight
+    - self-hosted
+    - sovereignty
+
+# -----------------------------------------------------------------------------
+#  TOOLS AND METHODS  ->  technologies
+# -----------------------------------------------------------------------------
+technologies:
+  LLM:
+    - large language model*
+    - LLM
+    - language model*
+    - generative AI
+    - ChatGPT
+    - Claude
+    - Anthropic
+    - prompt*
+  RAG:
+    - RAG
+    - retrieval-augmented
+  MCP:
+    keywords: [MCP, Model Context Protocol]
+    min: 1
+  AI agents:
+    - AI agent*
+    - agentic
+    - coding agent*
+  Computer vision:
+    keywords: [object detection, computer vision, YOLO]
+    min: 1
+  Neural networks:
+    - neural network*
+    - ANN
+    - deep learning
+  Foundation models:
+    - foundation model*
+  Python:
+    keywords: [Python]
+    min: 1
+  SQL and databases:
+    - PostgreSQL
+    - SQL
+    - ChromaDB
+    - vector database*
+  MLOps:
+    keywords: [MLOps]
+    min: 1
+  QGIS:
+    keywords: [QGIS]
+    min: 1
+  REST API:
+    - REST
+    - OpenAPI
+    - API
+  HPC and GPUs:
+    - HPC
+    - SLURM
+    - GPU*
+    - Open OnDemand

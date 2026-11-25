@@ -1,0 +1,74 @@
+# Draft generated from submissions/use-cases/Italy_Strategy.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Implementing the Italian Strategy for Artificial Intelligence 2024–2026 in public administration
+quip: A common framework for trustworthy AI across Italian public administration
+summary: |
+  A unified strategic framework, adoption guidelines and enablement initiatives to bring
+  secure, ethical and human-centric AI to central, regional and local administrations, with
+  human oversight for every administrative decision.
+
+main_area: Strategy, Governance and Organisation
+country: Italy
+
+challenge: |
+  Public administrations face rapid technological shifts and struggle to adopt AI in a
+  secure, ethical, and cohesive manner across national and local levels. Fragmented
+  initiatives risk creating competitive disadvantages, data silos, and non-compliance with
+  evolving European regulations. A unified strategic framework is necessary to coordinate
+  public investments, streamline administrative workflows, and protect fundamental rights.
+  Addressing this opportunity enables Italian PAs to deliver faster, human-centric public
+  services while ensuring transparency and trustworthiness.
+
+proposed_ai: |
+  The strategy guides the deployment of AI tools – such as generative systems and automation
+  platforms – to support administrative decision-making, internal operations, and public
+  service delivery. AI systems will process large volumes of administrative data, draft
+  documentation, and assist citizens through intelligent agents. Implementation relies on
+  clear guidelines and risk assessments where AI acts as a decision-support mechanism. Human
+  oversight remains mandatory for all final administrative decisions to guarantee
+  accountability, fairness, and compliance with rights.
+
+scope: |
+  This use case defines the overall strategic governance framework, adoption guidelines, and
+  enablement initiatives designed to integrate Artificial Intelligence across Italian Public
+  Administration services. It covers central government ministries, regional and local
+  authorities, as well as key digital agencies such as AgID and the Department for Digital
+  Transformation, facilitating collaboration with national research centers and citizens.
+  The initiative addresses public data assets, administrative document workflows, and
+  regulatory repositories across all thematic and administrative sectors nationwide.
+  Specifically excluded from this scope are fully autonomous administrative decisions made
+  without human validation, as well as unregulated private-sector deployment outside public
+  service domain guidelines.
+
+expected_outcome: |
+  The expected outcome is a modernized, agile, and trustworthy Public Administration
+  leveraging interoperable AI solutions across public services. Citizens and businesses will
+  benefit from faster, more accessible services and reduced bureaucratic overhead. Success
+  will be demonstrated by increased AI adoption rates across central and local bodies,
+  improved service delivery times, and adherence to ethical standards.
+
+environmental_contribution: |
+  The strategy promotes sustainable digital infrastructure and AI solutions that monitor
+  environmental data, support climate resilience, and optimize energy use. It encourages
+  evaluating the environmental footprint of AI systems and data centers to align with
+  national sustainability goals.
+
+digital_contribution: |
+  It accelerates public sector digital transformation by strengthening data quality,
+  interoperability, and cybersecurity across administrations. Furthermore, it fosters
+  digital skills, responsible automation, and scalable AI infrastructure within a
+  trustworthy regulatory framework.
+
+conditions: |
+  - Adherence to European regulations (EU AI Act) and national guidelines regarding
+    privacy, security, and ethics.
+  - High-quality, standardized, and interoperable public data assets are required for
+    effective AI training and inference.
+  - Clear human-in-the-loop validation mechanisms must be embedded in all administrative
+    workflows.
+  - Training programs are essential to upskill public employees and build internal AI
+    competencies.
+  - Solutions developed by one administration should be reusable across other public
+    entities to maximize the return of the investments and cohesion.

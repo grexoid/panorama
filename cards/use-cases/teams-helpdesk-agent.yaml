@@ -1,0 +1,56 @@
+# Draft generated from submissions/use-cases/Teams helpdesk agent.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Teams helpdesk agent
+quip: Onboarding questions answered where the information already lives
+summary: |
+  An AI assistant inside the EEA Teams environment answers newcomers' questions about where
+  documents, reporting rules and deadlines are, shortening onboarding for reporters and
+  expert-group members.
+
+main_area: People, Skills and Ways of Working
+affiliation: European Environment Agency (EEA)
+country: EU
+
+challenge: |
+  When an individual is newly assigned as a reporter or onboarded into a new role, it is
+  frequently difficult to identify the location of relevant data, documentation and
+  deadlines, as well as to determine which members constitute the relevant Task Force (TF),
+  Expert Group (EG) or helpdesk function. Locating this information currently requires
+  navigating a substantial volume of pages and documents, resulting in inefficient use of
+  time and a steep onboarding curve.
+
+proposed_ai: |
+  An AI-powered assistant would support users by responding to queries regarding the
+  location of relevant documentation, registration procedures for reporting obligations, and
+  access to applicable reporting guidelines and rules. The assistant would be integrated
+  within the existing EEA Teams environment, where the relevant information is already
+  centralised, ensuring that all users with access to the EEA channel could readily benefit
+  from the solution.
+
+expected_outcome: |
+  Newly assigned reporters or EG members would be able to query the assistant directly to
+  determine where specific documents are stored, clarify their primary objectives and
+  responsibilities, and identify any near-term deadlines or time-sensitive obligations
+  requiring attention. This would substantially reduce onboarding time and improve
+  early-stage task orientation.
+
+environmental_contribution: |
+  By reducing the time required to complete onboarding and information-retrieval tasks, the
+  use case would contribute to lower associated electricity consumption and, by extension, a
+  reduced environmental footprint.
+
+digital_contribution: |
+  The use case would meaningfully enhance interoperability and accessibility by enabling
+  experts to engage more directly with substantive work, as less time would be spent
+  locating relevant tasks and procedures. This would allow a stronger focus on delivering
+  outcomes and would create opportunities for incorporating further process automation.
+
+conditions: |
+  - GDPR compliance must be rigorously ensured when exposing data to the AI agent,
+    particularly with regard to personal or sensitive information.
+  - Over time, as users become proficient in navigating the environment independently,
+    reliance on the AI assistant is expected to diminish accordingly.
+  - Implementation would require no additional technical infrastructure at the level of
+    individual Member States, as integration would be managed centrally.

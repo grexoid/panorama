@@ -1,0 +1,69 @@
+# Draft generated from submissions/use-cases/SmartLab_AI Lab Germany.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: SmartLab – in-house capability building for digitalisation and AI
+quip: Peer-to-peer AI literacy training for environmental agencies
+summary: |
+  An in-house programme in four pillars – AI fundamentals, responsible AI, working culture
+  and practical application – delivered by the AI Lab and internal experts, to build AI
+  literacy across the German environment portfolio.
+
+main_area: People, Skills and Ways of Working
+affiliation: KI-Lab, German environment portfolio
+country: Germany
+
+challenge: |
+  The EU AI Act obliges public bodies to ensure AI literacy among staff, but the capacity of
+  the federal training academy (BAköV) is far below demand, and its curriculum is not
+  tailored to environmental work. Staff across the German environment portfolio need
+  low-threshold, practice-oriented training that fits their own tasks, delivered faster than
+  a central provider can supply it.
+
+proposed_ai: |
+  SmartLab is an in-house training programme run by the AI Lab that enables the use of AI
+  rather than applying it. It is structured in four pillars — AI and data analysis
+  fundamentals, responsible AI, working culture and methods, and practical application — and
+  combines virtual and in-person sessions delivered by KI-Lab staff and internal experts.
+  Content ranges from introductions to AI and large language models to AI ethics, agile
+  working, prompting and AI-assisted scientific publishing. Offers from BAköV and free
+  external providers are curated alongside, so the internal programme extends rather than
+  duplicates them.
+
+scope: |
+  - Staff of the German environment portfolio; sessions are published on a federal
+    collaboration platform that requires a federal administration account.
+  - Included: the internal session catalogue across the four pillars, the curated overview
+    of external offers, and sessions designed and delivered by subject experts from the
+    portfolio itself.
+  - Out of scope: formal certification (with exceptions), specialised domain-specific
+    model training, and replacement of the BAköV curriculum.
+
+expected_outcome: |
+  Staff across the portfolio can build AI literacy without waiting for scarce external
+  capacity, and can apply AI methods to their own environmental and administrative tasks.
+
+environmental_contribution: |
+  The programme raises the capacity of environmental authorities to use data and AI methods
+  in monitoring, assessment and policy advice, so that digital capability is built where
+  environmental expertise already sits.
+
+digital_contribution: |
+  It supports the digital agenda by meeting the AI Act literacy obligation, embedding
+  responsible-AI and critical-appraisal skills alongside technical content, and creating a
+  peer-to-peer format that scales through internal experts rather than through procurement.
+
+conditions: |
+  - Delivery capacity: the programme is carried by a small team; scaling depends on
+    experts outside the KI-Lab volunteering to design and run sessions.
+  - Quality of AI-assisted search: the prompt steers towards reviewed providers, but
+    results can be incomplete or invented, so users are told to verify offers before
+    booking — this is itself part of the critical-appraisal training.
+  - Platform: the current collaboration platform limits access to holders of a federal
+    account and is with very limited functionality, it is not a professional learning
+    platform;
+  - Measurement: reach and feedback can currently only be captured in a limited way, which
+    constrains evidence of effect.
+  - Reuse: the four-pillar curriculum structure, session designs and the search prompt
+    could transferable to other agencies; the prompt only needs its list of reviewed
+    providers replaced with national equivalents.

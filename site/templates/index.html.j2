@@ -1,56 +1,9 @@
-<!doctype html>
-<html lang="en" class="no-js" data-theme="dark">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ site.title }}</title>
-  {% if site.tagline %}
-  <meta name="description" content="{{ site.tagline }}">
-  {% endif %}
-  <meta name="color-scheme" content="dark light">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="static/style.css?v={{ assets.css }}">
-  <script>
-    /* Runs before first paint: enables JS-only styles and restores the saved theme. */
-    (function () {
-      var root = document.documentElement;
-      root.classList.replace('no-js', 'js');
-      try {
-        var saved = localStorage.getItem('gallery-theme');
-        if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
-      } catch (e) {}
-    })();
-  </script>
-  <script src="static/app.js?v={{ assets.js }}" defer></script>
-</head>
-<body>
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import icon, visual %}
 
-{% macro icon(name) -%}
-  {%- if name == 'search' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-  {%- elif name == 'chevron' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-  {%- elif name == 'globe' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.300 6.300-3.800 9c-2.500-2.700-3.800-5.700-3.800-9S9.500 5.700 12 3Z"/></svg>
-  {%- elif name == 'code' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
-  {%- elif name == 'play' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.500v15l12-7.500-12-7.500Z"/></svg>
-  {%- elif name == 'book' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.500A2.500 2.500 0 0 1 6.500 3H20v15H6.500A2.500 2.500 0 0 0 4 20.500v-15ZM4 20.500A2.500 2.500 0 0 0 6.500 23H20"/></svg>
-  {%- elif name == 'star' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true" class="fill"><path d="m12 2.500 2.900 6.100 6.600.8-4.900 4.600 1.300 6.600L12 17.300l-5.900 3.300 1.300-6.600L2.500 9.400l6.600-.8L12 2.500Z"/></svg>
-  {%- elif name == 'plus' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-  {%- elif name == 'theme' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M2 12h2M20 12h2M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400"/></svg>
-  {%- elif name == 'x' -%}
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-  {%- endif -%}
-{%- endmacro %}
-
-{% macro facet_menu(id, label, items) %}
-  <details class="menu" id="menu-{{ id }}" data-facet="{{ id }}">
+{# Dropdown with checkboxes. `facet` ties it to the filter logic in app.js. #}
+{% macro facet_menu(id, label, items, hidden=false) %}
+  <details class="menu" id="menu-{{ id }}" data-facet="{{ id }}"{% if hidden %} hidden{% endif %}>
     <summary class="control">
       <span>{{ label }}</span>
       <span class="badge" hidden></span>
@@ -75,13 +28,7 @@
   </details>
 {% endmacro %}
 
-{% macro visual(card, cls) %}
-  <span class="{{ cls }}" style="--h:{{ card.hue }}">
-    <span class="initials" aria-hidden="true">{{ card.initials }}</span>
-    {% if caller is defined %}{{ caller() }}{% endif %}
-  </span>
-{% endmacro %}
-
+{% block topbar %}
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="./" aria-label="{{ site.title }} - home">
@@ -92,11 +39,12 @@
     <div class="filters" role="search">
       <label class="search">
         {{ icon('search') }}
-        <input id="q" type="search" placeholder="{{ site.search_placeholder }}" aria-label="Search projects" autocomplete="off" spellcheck="false">
+        <input id="q" type="search" placeholder="{{ site.search_placeholder }}" aria-label="Search the gallery" autocomplete="off" spellcheck="false">
         <kbd aria-hidden="true">/</kbd>
       </label>
       {{ facet_menu('tags', 'Tags', facets.tags) }}
       {{ facet_menu('stack', 'Technologies', facets.stack) }}
+      {% if facets.areas %}{{ facet_menu('area', 'Area', facets.areas) }}{% endif %}
       <label class="control select">
         <span class="sr-only">Sort by</span>
         <select id="sort">
@@ -111,13 +59,15 @@
 
     <div class="actions">
       {% if site.contribute_url %}
-      <a class="cta" href="{{ site.contribute_url }}" target="_blank" rel="noopener">{{ icon('plus') }}<span>Add project</span></a>
+      <a class="cta" href="{{ site.contribute_url }}" target="_blank" rel="noopener">{{ icon('plus') }}<span>Contribute</span></a>
       {% endif %}
       <button class="icon-btn" id="theme" type="button" aria-label="Switch between dark and light theme" title="Switch theme">{{ icon('theme') }}</button>
     </div>
   </div>
 </header>
+{% endblock %}
 
+{% block main %}
 <main>
   <div class="pagehead">
     <h1>{{ site.heading }}</h1>
@@ -126,43 +76,57 @@
 
   <div class="toolbar">
     <div class="summary">
-      <p class="count" id="count" role="status" aria-live="polite">{{ cards|length }} project{{ '' if cards|length == 1 else 's' }}</p>
+      <p class="count" id="count" role="status" aria-live="polite">{{ cards|length }} card{{ '' if cards|length == 1 else 's' }}</p>
       <ul class="active-filters" id="active-filters" hidden></ul>
       <button class="link-btn" id="clear" type="button" hidden>Clear all</button>
     </div>
-    {% if statuses|length > 1 %}
-    <div class="segmented" id="status" role="group" aria-label="Filter by status">
-      <button type="button" data-status="all" aria-pressed="true">All</button>
-      {% for key, label in statuses %}
-      <button type="button" data-status="{{ key }}" aria-pressed="false">{{ label }}</button>
-      {% endfor %}
+    <div class="segments">
+      {% if counts.project and counts['use-case'] %}
+      <div class="segmented" id="type" role="group" aria-label="Show">
+        <button type="button" data-type="all" aria-pressed="true">All <span class="n">{{ counts.all }}</span></button>
+        <button type="button" data-type="project" aria-pressed="false">Projects <span class="n">{{ counts.project }}</span></button>
+        <button type="button" data-type="use-case" aria-pressed="false">Use cases <span class="n">{{ counts['use-case'] }}</span></button>
+      </div>
+      {% endif %}
+      {% if statuses|length > 1 %}
+      <div class="segmented" id="status" role="group" aria-label="Filter projects by status">
+        <button type="button" data-status="all" aria-pressed="true">Any status</button>
+        {% for key, label in statuses %}
+        <button type="button" data-status="{{ key }}" aria-pressed="false">{{ label }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
   </div>
 
   <ul class="grid" id="grid">
     {% for card in cards %}
+    {% set is_uc = card.type == 'use-case' %}
     <li class="cell"
+        data-type="{{ card.type }}"
         data-name="{{ card.name|lower }}"
         data-tags="{{ card.tags|map(attribute='key')|join('|') }}"
         data-stack="{{ card.stack|map(attribute='key')|join('|') }}"
+        data-area="{{ card.area_key if is_uc else '' }}"
         data-status="{{ card.status }}"
         data-featured="{{ 1 if card.featured else 0 }}"
         data-updated="{{ card.updated.isoformat() if card.updated else '' }}"
         data-released="{{ card.released.isoformat() if card.released else '' }}"
         data-search="{{ card.search }}">
-      <article class="card" id="{{ card.slug }}" tabindex="0" aria-labelledby="{{ card.slug }}-title" style="--h:{{ card.hue }}">
+      <article class="card{{ ' is-use-case' if is_uc }}" id="{{ card.type }}-{{ card.slug }}" tabindex="0" aria-labelledby="{{ card.type }}-{{ card.slug }}-title" style="--h:{{ card.hue }}">
 
-        {% if card.screenshot %}
-        <span class="bg" aria-hidden="true"><img src="{{ card.screenshot }}" alt="" loading="lazy" decoding="async"></span>
+        {% if card.cover and not is_uc %}
+        <span class="bg" aria-hidden="true"><img src="{{ card.cover|asset }}" alt="" loading="lazy" decoding="async"></span>
         {% endif %}
 
         <header class="card-head">
           {% call visual(card, 'icon') %}
-            {% if card.thumbnail or card.screenshot %}<img src="{{ card.thumbnail or card.screenshot }}" alt="" loading="lazy" decoding="async">{% endif %}
+            {% set tile = card.thumbnail if is_uc else (card.thumbnail or card.screenshot) %}
+            {% if tile %}<img src="{{ tile|asset }}" alt="" loading="lazy" decoding="async">{% endif %}
           {% endcall %}
           <div class="titles">
-            <h2 id="{{ card.slug }}-title">{{ card.name }}</h2>
+            {% if is_uc %}<p class="kicker">Use case<span> · {{ card.area_short }}</span></p>{% endif %}
+            <h2 id="{{ card.type }}-{{ card.slug }}-title">{{ card.name }}</h2>
             {% if card.quip %}<p class="quip">{{ card.quip }}</p>{% endif %}
           </div>
           <div class="badges">
@@ -181,12 +145,16 @@
         <div class="more">
           <div class="more-inner">
             {% call visual(card, 'shot') %}
-              {% if card.screenshot %}<img src="{{ card.screenshot }}" alt="Screenshot of {{ card.name }}" loading="lazy" decoding="async">{% endif %}
+              {% if card.cover %}<img src="{{ card.cover|asset }}" alt="{{ 'Figure from ' if is_uc else 'Screenshot of ' }}{{ card.name }}" loading="lazy" decoding="async">{% endif %}
               <span class="status s-{{ card.status }}">{{ card.status_label }}</span>
             {% endcall %}
 
             <div class="prose">
+              {% if is_uc %}
+              <p>{{ card.summary }}</p>
+              {% else %}
               {% for p in card.paragraphs %}<p>{{ p }}</p>{% endfor %}
+              {% endif %}
             </div>
 
             {% if card.stack %}
@@ -201,6 +169,11 @@
             {% endif %}
 
             <dl class="meta">
+              {% if is_uc %}
+              <div><dt>Area</dt><dd>{{ card.area_label }}</dd></div>
+              {% if card.affiliation %}<div><dt>By</dt><dd>{{ card.affiliation }}</dd></div>{% endif %}
+              {% if card.country %}<div><dt>Country</dt><dd>{{ card.country }}</dd></div>{% endif %}
+              {% else %}
               {% if card.category %}<div><dt>Category</dt><dd>{{ card.category }}</dd></div>{% endif %}
               {% if card.version %}<div><dt>Version</dt><dd>{{ card.version }}</dd></div>{% endif %}
               {% if card.license %}<div><dt>License</dt><dd>{{ card.license }}</dd></div>{% endif %}
@@ -208,13 +181,18 @@
               {% if card.updated %}<div><dt>Updated</dt><dd><time datetime="{{ card.updated.isoformat() }}">{{ card.updated_text }}</time></dd></div>{% endif %}
               {% if card.released and card.released != card.updated %}<div><dt>Released</dt><dd><time datetime="{{ card.released.isoformat() }}">{{ card.released_text }}</time></dd></div>{% endif %}
               {% if card.contact_name %}<div><dt>Contact</dt><dd>{% if card.contact_email %}<a href="mailto:{{ card.contact_email }}">{{ card.contact_name }}</a>{% else %}{{ card.contact_name }}{% endif %}</dd></div>{% endif %}
+              {% endif %}
             </dl>
 
             <nav class="links" aria-label="Links for {{ card.name }}">
+              {% if is_uc %}
+              <a class="btn primary" href="{{ card.page }}">Read use case{{ icon('arrow-right') }}</a>
+              {% else %}
               {% if card.links.website %}<a class="btn primary" href="{{ card.links.website }}" target="_blank" rel="noopener">{{ icon('globe') }}Website</a>{% endif %}
               {% if card.links.demo_url %}<a class="btn demo" href="{{ card.links.demo_url }}" target="_blank" rel="noopener">{{ icon('play') }}Demo</a>{% endif %}
               {% if card.links.repo_url %}<a class="btn" href="{{ card.links.repo_url }}" target="_blank" rel="noopener">{{ icon('code') }}Repository</a>{% endif %}
               {% if card.links.docs_url %}<a class="btn" href="{{ card.links.docs_url }}" target="_blank" rel="noopener">{{ icon('book') }}Docs</a>{% endif %}
+              {% endif %}
             </nav>
           </div>
         </div>
@@ -224,20 +202,9 @@
   </ul>
 
   <div class="empty" id="empty" {% if cards %}hidden{% endif %}>
-    <p class="empty-title" id="empty-title">{{ 'No projects match your filters' if cards else 'No projects yet' }}</p>
-    <p class="empty-hint" id="empty-hint">{% if cards %}Try a different search or remove some filters.{% else %}Add a YAML file to the <code>projects</code> folder to get started.{% endif %}</p>
+    <p class="empty-title" id="empty-title">{{ 'No cards match your filters' if cards else 'Nothing here yet' }}</p>
+    <p class="empty-hint" id="empty-hint">{% if cards %}Try a different search or remove some filters.{% else %}Add a YAML file to the <code>cards/projects</code> or <code>cards/use-cases</code> folder to get started.{% endif %}</p>
     {% if cards %}<button class="btn" id="reset" type="button">Clear all filters</button>{% endif %}
   </div>
 </main>
-
-<footer class="footer">
-  <p>
-    {{ cards|length }} project{{ '' if cards|length == 1 else 's' }} · built {{ built_on.day }} {{ built_on.strftime('%b %Y') }}
-    {% if site.footer %}· {{ site.footer }}{% endif %}
-    {% if site.contribute_url %}· <a href="{{ site.contribute_url }}" target="_blank" rel="noopener">Add your project</a>{% endif %}
-    · <a href="projects.json">JSON</a>
-  </p>
-</footer>
-
-</body>
-</html>
+{% endblock %}

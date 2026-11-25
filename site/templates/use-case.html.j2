@@ -1,0 +1,151 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import icon, rich %}
+
+{% block title %}{{ card.name }} · {{ site.title }}{% endblock %}
+
+{% block meta %}
+  <meta name="description" content="{{ card.summary or card.quip }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ card.name }}">
+  <meta property="og:description" content="{{ card.summary or card.quip }}">
+{% endblock %}
+
+{% block body_class %}expose-page{% endblock %}
+
+{% block topbar %}
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ root }}" aria-label="{{ site.title }} - home">
+      <span class="brand-icon" aria-hidden="true">{{ site.icon }}</span>
+      <span class="brand-name">{{ site.title }}</span>
+    </a>
+    <a class="back" href="{{ root }}?type=use-cases">{{ icon('arrow-left') }}<span>All use cases</span></a>
+    <div class="actions">
+      {% if site.contribute_url %}
+      <a class="cta" href="{{ site.contribute_url }}" target="_blank" rel="noopener">{{ icon('plus') }}<span>Contribute</span></a>
+      {% endif %}
+      <button class="icon-btn" id="theme" type="button" aria-label="Switch between dark and light theme" title="Switch theme">{{ icon('theme') }}</button>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="expose" style="--h:{{ card.hue }}">
+
+  {# ---------------------------------------------------------------- hero #}
+  <header class="x-hero">
+    <div class="x-hero-inner">
+      <p class="x-kicker"><span aria-hidden="true">💡</span> Use case <span class="status s-idea">Idea</span></p>
+      <h1>{{ card.name }}</h1>
+      {% if card.quip %}<p class="x-quip">{{ card.quip }}</p>{% endif %}
+
+      <ul class="x-meta">
+        <li class="x-area a-{{ card.area_key }}">{{ card.area_label }}</li>
+        {% if card.affiliation %}<li>{{ icon('building') }}{{ card.affiliation }}</li>{% endif %}
+        {% if card.country %}<li>{{ icon('pin') }}{{ card.country }}</li>{% endif %}
+      </ul>
+
+      {% if card.tags %}
+      <ul class="chips x-tags" aria-label="Tags">
+        {% for t in card.tags %}
+        <li><a class="chip" style="--h:{{ t.hue }}" href="{{ root }}?tag={{ t.key|urlencode }}" title="Show everything tagged “{{ t.label }}”">{{ t.label }}</a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="x-layout">
+    {# ---------------------------------------------------------------- reading column #}
+    <article class="x-body">
+      {% if card.summary %}<p class="x-lead">{{ card.summary }}</p>{% endif %}
+
+      {% if card.images %}
+      <section class="x-section x-gallery" id="figures" aria-label="{{ 'Illustration' if card.images|length == 1 else 'Illustrations' }}">
+        <div class="x-figs n{{ [card.images|length, 3]|min }}">
+          {% for img in card.images %}
+          <figure>
+            <a href="{{ img.url|asset(root) }}" target="_blank" rel="noopener" title="Open full size">
+              <img src="{{ img.url|asset(root) }}" alt="{{ img.caption or ('Figure ' ~ loop.index ~ ' of ' ~ card.name) }}" loading="{{ 'eager' if loop.first else 'lazy' }}" decoding="async">
+            </a>
+            {% if img.caption %}<figcaption>{{ img.caption }}</figcaption>{% endif %}
+          </figure>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% for group in card.groups %}
+        {% if group.sections|length > 1 %}
+      <div class="x-pair">
+        {% for s in group.sections %}
+        <section class="x-section" id="{{ s.field }}">
+          <h2><span class="x-ico f-{{ s.field }}">{{ icon(s.field) }}</span>{{ s.title }}</h2>
+          <div class="x-text">{{ rich(s.blocks) }}</div>
+        </section>
+        {% endfor %}
+      </div>
+        {% else %}
+          {% set s = group.sections[0] %}
+      <section class="x-section" id="{{ s.field }}">
+        <h2><span class="x-ico f-{{ s.field }}">{{ icon(s.field) }}</span>{{ s.title }}</h2>
+        <div class="x-text{{ ' x-checks' if s.field == 'conditions' }}">{{ rich(s.blocks) }}</div>
+      </section>
+        {% endif %}
+      {% endfor %}
+    </article>
+
+    {# ---------------------------------------------------------------- sidebar #}
+    <aside class="x-aside">
+      <div class="x-panel">
+        <h2>At a glance</h2>
+        <dl class="x-facts">
+          <div><dt>Type</dt><dd>Use case · idea</dd></div>
+          <div><dt>Main area</dt><dd>{{ card.area_label }}</dd></div>
+          {% if card.affiliation %}<div><dt>Organisation</dt><dd>{{ card.affiliation }}</dd></div>{% endif %}
+          {% if card.country %}<div><dt>Country</dt><dd>{{ card.country }}</dd></div>{% endif %}
+          {% if card.updated %}<div><dt>Submitted</dt><dd><time datetime="{{ card.updated.isoformat() }}">{{ card.updated_text }}</time></dd></div>{% endif %}
+          {% if card.contact_name %}<div><dt>Contact</dt><dd>{% if card.contact_email %}<a href="mailto:{{ card.contact_email }}">{{ card.contact_name }}</a>{% else %}{{ card.contact_name }}{% endif %}</dd></div>{% endif %}
+        </dl>
+        {% if card.stack %}
+        <h3>Technologies</h3>
+        <ul class="chips">
+          {% for s in card.stack %}
+          <li><a class="chip plain" href="{{ root }}?tech={{ s.key|urlencode }}" title="Show everything using “{{ s.label }}”">{{ s.label }}</a></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+
+      <nav class="x-panel x-toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <ol>
+          {% if card.images %}<li><a href="#figures">{{ 'Illustration' if card.images|length == 1 else 'Illustrations' }}</a></li>{% endif %}
+          {% for group in card.groups %}{% for s in group.sections %}
+          <li><a href="#{{ s.field }}">{{ s.title }}</a></li>
+          {% endfor %}{% endfor %}
+        </ol>
+      </nav>
+    </aside>
+  </div>
+
+  {# ---------------------------------------------------------------- related #}
+  {% if card.related %}
+  <section class="x-related">
+    <h2>Related use cases</h2>
+    <ul>
+      {% for r in card.related %}
+      <li>
+        <a class="rel-card" href="{{ root }}{{ r.page }}" style="--h:{{ r.hue }}">
+          <span class="rel-area">{{ r.area_short }}</span>
+          <strong>{{ r.name }}</strong>
+          {% if r.quip %}<span class="rel-quip">{{ r.quip }}</span>{% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

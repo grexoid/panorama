@@ -1,26 +1,48 @@
-/* Progressive enhancement for the gallery: search, facet filters, status, sort.
-   The page is fully rendered at build time; this only shows/hides/reorders cards. */
+/* Progressive enhancement. The pages are fully rendered at build time; this adds
+   - on every page: the theme toggle and a graceful fallback for broken images,
+   - on the gallery: search, type / status / facet filters and sorting (shown/hidden/reordered cards). */
 (() => {
   'use strict';
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+  /* ------------------------------------------------------------ every page: theme + images */
+
+  $('#theme')?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('gallery-theme', next); } catch (e) { /* private mode */ }
+  });
+
+  // Broken or missing images fall back to the gradient + initials placeholder underneath.
+  const dropBroken = (img) => {
+    if (img.complete && img.naturalWidth === 0) (img.closest('.bg') || img).remove();
+  };
+  document.addEventListener('error', (e) => {
+    if (e.target instanceof HTMLImageElement) (e.target.closest('.bg') || e.target).remove();
+  }, true);
+  $$('.card img, .x-hero-bg').forEach(dropBroken);
+
   const grid = $('#grid');
   if (!grid) return;
 
+  /* ------------------------------------------------------------ gallery: data */
+
+  const split = (v) => new Set(v ? v.split('|') : []);
   const cells = $$('.cell', grid).map((el) => ({
     el,
+    type: el.dataset.type,
     name: el.dataset.name,
     search: el.dataset.search,
     status: el.dataset.status,
     featured: el.dataset.featured === '1',
     updated: el.dataset.updated,
     released: el.dataset.released,
-    tags: new Set(el.dataset.tags ? el.dataset.tags.split('|') : []),
-    stack: new Set(el.dataset.stack ? el.dataset.stack.split('|') : []),
+    tags: split(el.dataset.tags),
+    stack: split(el.dataset.stack),
+    area: split(el.dataset.area),
   }));
-  const defaultOrder = cells.map((c) => c.el);
 
   const ui = {
     q: $('#q'),
@@ -29,25 +51,40 @@
     active: $('#active-filters'),
     clear: $('#clear'),
     empty: $('#empty'),
+    type: $('#type'),
     status: $('#status'),
     menus: $$('details.menu'),
   };
 
-  // Facets: "tags" and "stack" share the same shape. URL param names are kept short and readable.
-  const FACETS = { tags: { param: 'tag', label: 'Tag' }, stack: { param: 'tech', label: 'Tech' } };
-  const labels = { tags: new Map(), stack: new Map() };
+  // Facet filters share one shape. URL parameter names are short and readable.
+  const FACETS = {
+    tags: { param: 'tag', label: 'Tag' },
+    stack: { param: 'tech', label: 'Tech' },
+    area: { param: 'area', label: 'Area' },
+  };
+  const labels = { tags: new Map(), stack: new Map(), area: new Map() };
   for (const menu of ui.menus) {
     for (const opt of $$('.opt', menu)) {
       labels[menu.dataset.facet].set($('input', opt).value, $('.opt-label', opt).textContent);
     }
   }
 
-  const state = { q: '', tags: new Set(), stack: new Set(), status: 'all', sort: 'featured' };
+  // Card types: internal name -> URL value and wording for the result count.
+  const TYPES = {
+    project: { param: 'projects', one: 'project', many: 'projects' },
+    'use-case': { param: 'use-cases', one: 'use case', many: 'use cases' },
+  };
+  const typeFromParam = (v) => Object.keys(TYPES).find((t) => TYPES[t].param === v || t === v) || 'all';
+
+  const state = { q: '', type: 'all', status: 'all', tags: new Set(), stack: new Set(), area: new Set(), sort: 'featured' };
 
   /* ------------------------------------------------------------ filtering */
 
+  const inType = (c) => state.type === 'all' || c.type === state.type;
+
   const matches = (c) => {
-    if (state.status !== 'all' && c.status !== state.status) return false;
+    if (!inType(c)) return false;
+    if (state.status !== 'all' && !(c.type === 'project' && c.status === state.status)) return false;
     for (const f of Object.keys(FACETS)) {
       // OR within a facet, AND across facets.
       if (state[f].size && ![...state[f]].some((k) => c[f].has(k))) return false;
@@ -60,16 +97,20 @@
   };
 
   const sorters = {
-    featured: (a, b) => b.featured - a.featured || b.updated.localeCompare(a.updated) || a.name.localeCompare(b.name),
+    featured: (a, b) => b.featured - a.featured || b.updated.localeCompare(a.updated) || (a.type === b.type ? 0 : a.type === 'project' ? -1 : 1) || a.name.localeCompare(b.name),
     updated: (a, b) => b.updated.localeCompare(a.updated) || a.name.localeCompare(b.name),
     released: (a, b) => b.released.localeCompare(a.released) || a.name.localeCompare(b.name),
     name: (a, b) => a.name.localeCompare(b.name),
   };
 
-  const filtersActive = () => state.q || state.status !== 'all' || state.tags.size || state.stack.size;
+  const facetsActive = () => state.tags.size || state.stack.size || state.area.size;
+  const filtersActive = () => state.q || state.status !== 'all' || facetsActive();
 
   function render() {
-    // sort (build-time order is the "featured" order, so just restore it for that case)
+    // Which controls make sense for the chosen type? Status belongs to projects, area to use cases.
+    if (state.type === 'use-case') state.status = 'all';
+    if (state.type === 'project') state.area.clear();
+
     const ordered = [...cells].sort(sorters[state.sort] || sorters.featured);
     const frag = document.createDocumentFragment();
     ordered.forEach((c) => frag.append(c.el));
@@ -82,9 +123,10 @@
       if (ok) shown++;
     }
 
-    ui.count.textContent = filtersActive()
-      ? `${shown} of ${cells.length} project${cells.length === 1 ? '' : 's'}`
-      : `${cells.length} project${cells.length === 1 ? '' : 's'}`;
+    const total = cells.filter(inType).length;
+    const noun = state.type === 'all' ? ['card', 'cards'] : [TYPES[state.type].one, TYPES[state.type].many];
+    const word = (n) => (n === 1 ? noun[0] : noun[1]);
+    ui.count.textContent = filtersActive() ? `${shown} of ${total} ${word(total)}` : `${total} ${word(total)}`;
     ui.empty.hidden = shown > 0 || cells.length === 0;
 
     renderActiveFilters();
@@ -94,7 +136,7 @@
 
   function renderActiveFilters() {
     ui.active.replaceChildren();
-    const add = (kind, key, text, onRemove) => {
+    const add = (kind, text, onRemove) => {
       const li = document.createElement('li');
       const b = document.createElement('button');
       b.type = 'button';
@@ -109,11 +151,11 @@
       ui.active.append(li);
     };
     for (const [f, meta] of Object.entries(FACETS)) {
-      for (const key of state[f]) add(meta.label, key, labels[f].get(key) || key, () => toggle(f, key, false));
+      for (const key of state[f]) add(meta.label, labels[f].get(key) || key, () => toggle(f, key, false));
     }
     if (state.status !== 'all') {
       const btn = $(`[data-status="${state.status}"]`, ui.status || document);
-      add('Status', state.status, btn ? btn.textContent : state.status, () => setStatus('all'));
+      add('Status', btn ? btn.textContent : state.status, () => setStatus('all'));
     }
     ui.active.hidden = ui.active.childElementCount === 0;
     ui.clear.hidden = !filtersActive();
@@ -122,18 +164,28 @@
   function syncControls() {
     if (ui.q.value !== state.q) ui.q.value = state.q;
     ui.sort.value = state.sort;
+
     for (const menu of ui.menus) {
       const f = menu.dataset.facet;
       $$('input[type=checkbox]', menu).forEach((cb) => { cb.checked = state[f].has(cb.value); });
       const badge = $('.badge', menu);
       badge.textContent = state[f].size;
       badge.hidden = state[f].size === 0;
+      if (f === 'area') {                       // use-case only
+        menu.hidden = state.type === 'project';
+        if (menu.hidden) menu.open = false;
+      }
     }
-    if (ui.status) $$('button', ui.status).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.status === state.status)));
+    if (ui.type) $$('button', ui.type).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
+    if (ui.status) {
+      ui.status.hidden = state.type === 'use-case';  // use cases have no lifecycle status
+      $$('button', ui.status).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.status === state.status)));
+    }
     // highlight chips that are currently active
     for (const chip of $$('.chip[data-facet]')) {
-      chip.classList.toggle('on', state[chip.dataset.facet].has(chip.dataset.key));
-      chip.setAttribute('aria-pressed', String(state[chip.dataset.facet].has(chip.dataset.key)));
+      const on = state[chip.dataset.facet].has(chip.dataset.key);
+      chip.classList.toggle('on', on);
+      chip.setAttribute('aria-pressed', String(on));
     }
   }
 
@@ -152,6 +204,7 @@
     state.status = 'all';
     state.tags.clear();
     state.stack.clear();
+    state.area.clear();
     render();
   }
 
@@ -160,6 +213,7 @@
   function writeUrl() {
     const p = new URLSearchParams();
     if (state.q) p.set('q', state.q);
+    if (state.type !== 'all') p.set('type', TYPES[state.type].param);
     for (const [f, meta] of Object.entries(FACETS)) state[f].forEach((k) => p.append(meta.param, k));
     if (state.status !== 'all') p.set('status', state.status);
     if (state.sort !== 'featured') p.set('sort', state.sort);
@@ -172,11 +226,12 @@
   function readUrl() {
     const p = new URLSearchParams(location.search);
     state.q = (p.get('q') || '').trim();
+    state.type = typeFromParam(p.get('type'));
     for (const [f, meta] of Object.entries(FACETS)) {
       p.getAll(meta.param).forEach((k) => { if (labels[f].has(k)) state[f].add(k); });
     }
     const status = p.get('status');
-    if (status && (!ui.status || $(`[data-status="${CSS.escape(status)}"]`, ui.status))) state.status = status;
+    if (status && ui.status && $(`[data-status="${CSS.escape(status)}"]`, ui.status)) state.status = status;
     const sort = p.get('sort');
     if (sort && sorters[sort]) state.sort = sort;
   }
@@ -190,6 +245,10 @@
   ui.sort.addEventListener('change', () => { state.sort = ui.sort.value; render(); });
   ui.clear.addEventListener('click', reset);
   $('#reset')?.addEventListener('click', reset);
+  ui.type?.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-type]');
+    if (b) { state.type = b.dataset.type; render(); }
+  });
   ui.status?.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-status]');
     if (b) setStatus(b.dataset.status);
@@ -283,24 +342,6 @@
       e.preventDefault();
       e.target.classList.toggle('open');
     }
-  });
-
-  // Broken or missing images fall back to the gradient + initials placeholder underneath.
-  const dropBroken = (img) => { if (img.complete && img.naturalWidth === 0) img.closest('.bg') ? img.closest('.bg').remove() : img.remove(); };
-  document.addEventListener('error', (e) => {
-    if (e.target instanceof HTMLImageElement) {
-      const bg = e.target.closest('.bg');
-      (bg || e.target).remove();
-    }
-  }, true);
-  $$('.card img').forEach(dropBroken);
-
-  /* ------------------------------------------------------------ theme */
-
-  $('#theme')?.addEventListener('click', () => {
-    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem('gallery-theme', next); } catch (e) { /* private mode */ }
   });
 
   /* ------------------------------------------------------------ go */

@@ -1,0 +1,144 @@
+# =============================================================================
+#  USE-CASE CARD
+#  Describe an idea for using AI - something you would like to do, but that is
+#  not a running project yet. No programming needed.
+# =============================================================================
+#
+#  This card follows the Word template for use cases (submissions/use-cases_template.docx):
+#  every field below is one numbered section of that document, so you can copy your
+#  answers across. The site turns your card into a page of its own - a small exposé
+#  with your text, your pictures and the facts at a glance.
+#
+#  WHAT TO DO
+#   1. Copy this file into the "cards/use-cases" folder and rename it after your idea,
+#      using only lowercase letters, digits and dashes - for example
+#      cards/use-cases/permit-data-extraction.yaml. The file name becomes the web address
+#      of your page; it is not shown anywhere else.
+#   2. Replace the example text after each "field:" with your own.
+#   3. Lines that start with "#" are notes for you; the website ignores them.
+#      Lines marked OPTIONAL are switched off - delete the "# " at the start of a line
+#      to use it.
+#   4. Save, and submit the file (see "Adding a card" in the README).
+#      A check runs automatically and tells you if anything needs fixing.
+#
+#  TAGS ARE AUTOMATIC
+#   You do not have to choose tags or technologies. When the site is built, they are
+#   picked from the words in your text (see site/taxonomy.yaml). Your own `tags:` and
+#   `stack:` lines are optional additions.
+#
+#  THE FEW RULES OF THIS FILE FORMAT (it is called YAML)
+#   - Each entry looks like   field: value   -- keep the space after the colon.
+#   - Indent with spaces only, never with the Tab key.
+#   - Longer texts start with   field: |   and continue on the following lines, each
+#     indented by two spaces. A blank line starts a new paragraph. A line that starts
+#     with "- " becomes a bullet point.
+#   - Short one-line values containing a colon followed by a space (e.g. "Note: this"),
+#     or starting with a quote, #, [, {, *, & or !, need double quotes around them.
+#   - Dates are written year-month-day, e.g. 2026-11-04.
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+#  REQUIRED
+# -----------------------------------------------------------------------------
+
+# A short, descriptive title for the idea.
+name: AI-assisted quality control of environmental reporting data
+
+# 1. Main area - which of the four areas does the use case belong to?
+# Choose exactly ONE and copy it exactly as written:
+#   Strategy, Governance and Organisation
+#   People, Skills and Ways of Working
+#   Data, Technologies and Infrastructure
+#   AI Applications and Value Creation
+main_area: AI Applications and Value Creation
+
+# 2. Challenge or opportunity - what is difficult, inefficient or currently not
+# possible? Who experiences the problem, and why is it important to address?
+challenge: |
+  Describe the problem, need or opportunity in a few sentences.
+
+# 3. Proposed use of AI - what would the AI do, and how would people work with it?
+# Focus on the task, not on a specific tool. Say where human judgement stays in charge.
+proposed_ai: |
+  Describe what the AI would do and where experts would remain responsible.
+
+
+# -----------------------------------------------------------------------------
+#  RECOMMENDED - the more you fill in, the better others can understand the idea
+# -----------------------------------------------------------------------------
+
+# One short line shown under the title on the gallery card (about 8 words).
+quip: A short, catchy summary
+
+# Two sentences for the gallery card and the top of your page. If you leave this
+# out, the first sentences of "proposed_ai" are used.
+summary: |
+  Say in two sentences what the idea is and what it would achieve.
+
+# 4. Scope - what is included and what is not? Think of: the process or service,
+# the main users, the data involved, the organisational or geographic coverage,
+# and anything specifically left out. Keep it to one short paragraph or 4 bullet points.
+scope: |
+  - What is covered: ...
+  - Who would use it: ...
+  - Which data or documents are involved: ...
+  - What is not included: ...
+
+# 5. Expected outcome - what will be better, faster, easier or newly possible?
+# How would you know it worked? Two to three sentences.
+expected_outcome: |
+  Describe the concrete result you expect, and how success would be recognised.
+
+# 6. Contribution to the environment and the digital agenda - three or four sentences
+# each. Environment: better monitoring, reporting or assessment? stronger evidence for
+# policy? easier access to knowledge? Digital: better services, data quality or
+# interoperability? responsible automation? new AI skills? reusable solutions?
+environmental_contribution: |
+  How does the idea help environmental objectives?
+digital_contribution: |
+  How does the idea help digital development?
+# (If you prefer one combined text, delete the two fields above and use this one instead.)
+# contribution: |
+#   One text covering both the environment and the digital agenda.
+
+# 7. Key conditions and considerations - the most important requirements, dependencies
+# or risks: data availability and quality, data protection, human oversight, skills,
+# infrastructure, environmental footprint, reuse. One bullet per point.
+conditions: |
+  - Suitable data must be available.
+  - Results must be transparent enough for expert validation.
+  - Human review must remain part of the workflow.
+
+
+# -----------------------------------------------------------------------------
+#  OPTIONAL - delete the "# " at the start of a line to use it
+# -----------------------------------------------------------------------------
+
+# Who is behind the idea, and where.
+# affiliation: Name of your organisation
+# country: Austria
+# contact: Jane Doe <jane.doe@example.org>     # name first, e-mail in < >
+
+# Pictures for your page, e.g. an architecture diagram or a mock-up. Add the picture
+# files to the folder "cards/use-cases/images/<your-card-name>/" and list them here.
+# The caption is optional but helps. The first picture is also shown on the gallery card.
+# Allowed formats: png, jpg, webp, gif, svg. Keep each file under 1.5 MB.
+# Please only use pictures you may publish: no personal data (names, e-mail addresses,
+# screenshots of internal tools) and nothing copyrighted by others.
+# images:
+#   - file: images/my-idea/architecture.png
+#     caption: How the pieces fit together
+#   - file: images/my-idea/mockup.png
+
+# Your own keywords, added to the automatic ones. Usually not needed.
+# tags:
+#   - land use
+# stack:
+#   - Python
+
+# Put "false" here if the automatic tags are wrong for this card.
+# auto_tag: false
+
+# The date you submitted the idea, written year-month-day.
+# submitted_on: 2026-11-04

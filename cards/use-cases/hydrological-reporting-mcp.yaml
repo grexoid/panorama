@@ -1,0 +1,138 @@
+# Draft generated from submissions/use-cases/Eionet AI use case - Belgium - hydrological state reporting using MCP.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: Hydrological state reporting with an MCP server for waterinfo.be
+quip: Ask the Flemish water network in plain language
+summary: |
+  A proof of concept exposes the KiWIS measurement API of waterinfo.be to an LLM through an
+  MCP server, so that hydrologists and crisis staff can query live water data and compile
+  hydrological bulletins in natural language.
+
+main_area: AI Applications and Value Creation
+affiliation: Flanders Environment Agency (VMM)
+country: Belgium
+
+challenge: |
+  The waterinfo portal (https://waterinfo.vlaanderen.be) is a collaborative effort between
+  several governmental bodies in Flanders, active in the water sector. At VMM, we operate
+  and maintain the measurement networks on the non-navigable waterways. The information
+  (measurement timeseries, radar imagery, …) is available through a dedicated API (KiWIS by
+  Kisters AG).
+
+  - waterinfo.be data (levels, discharge, precipitation, physical- and chemical
+    parameters, radar-derived QPE) is only accessible via the KiWIS REST API requiring
+    knowledge of how the API works as week as.
+  - Compilation of hydrological bulletins today means manually cross-referencing multiple
+    stations/catchments and sometimes external sources, which is time-consuming and
+    depends on a small pool of API-literate data scientists.
+  - Rising demand (management, crisis cells, other agencies) for fast, plain-language
+    answers on current water status without going through GIS/API tooling.
+  - MCP is emerging as a standard way to expose existing APIs as LLM tools without
+    rebuilding the underlying data infrastructure.
+
+proposed_ai: |
+  - An MCP server wraps the existing KiWIS API and allows to encode specific ways in which
+    the datamodel has been organized. the KiWIS API is fairly generic, however, how the
+    data model, naming conventions etc are organized is entirely up to the user and thus
+    deployment-specific. So the MCP server should capture this
+  - The MCP is exposed such that an LLM is able to call it using natural language
+    processing : “what is the current discharge at station X”, “how much did it rain the
+    last 24 hours in catchement Y”, …
+  - The LLM, in reasoning mode is then able to identify the right tools in the MCP as well
+    as combine this information with third party sources when confronted with more complex
+    inquiries such as “Summarize the hydrological state of Flanders for the past week,
+    treating water level, discharge and rainfall” for example.
+
+  Below is the output for exactly this prompt using Anthropic Claude OPUS 5.
+
+  Interesting observations of what is produced automatically, without asking explicitly:
+
+  - Averages, medians over basins, speaks of baseflow (both of which are hydrologically
+    very relevant), without asking.
+  - Rainfall and discharge maps
+  - Correctly identified (by merit of the MCP) the relevant timeseries in the database
+    (e.g. Dag.Percentielen(14d-Jaar) to get the discharge percentiles (14day averages) for
+    the time of the year
+  - Is honest about gaps, quality peaks and data origins (timeseries groups).
+  - Links soil texture to station location, without the data explicitly being linked in
+    the KiWIS or MCP, so this assessment comes from other data sources the LLM accessed in
+    order to fully analyse the data.
+  - Admittedly beautiful visualisations
+
+  On the other hand, produces sums and medians per basin of discharge, which are not
+  necessarily representative for the basin -> here expert judgement needed.
+
+scope: |
+  - Covered: read access to waterinfo.be measurement stations, time series (level,
+    discharge, precipitation) and metadata via the KIWIS API, exposed through an MCP
+    server to an LLM interface.
+  - Users: VMM hydrologists and water managers, crisis/emergency staff, possibly other
+    Flemish agencies or the public in a later phase.
+  - Data: near-real-time and historical time series, station/catchment metadata, rating
+    curves, data-quality flags, radar imagery, …
+  - Out of scope: write/actuation capability, forecasting or modelling logic, non-VMM data
+    sources
+
+expected_outcome: |
+  - Ability to interact with the waterinfo.be measurements via natural language without
+    understanding the technicalities of the API, webinterface or programming languages
+  - Ability to better link different sources of information together when compiling
+    hydrological information bulletins, where nowadays,
+  - Noticeably shorter time to compile a hydrological bulletin, and perhaps with novel
+    insights
+  - A wider group of staff can query live water data directly, without needing API or GIS
+    skills, this can be demonstrated by adoption outside of the current small-ish group of
+    data scientists & API -users.
+
+environmental_contribution: |
+  - improves timely access to hydrological monitoring data for staff and decision-makers
+  - supports faster situational awareness during high-water events (or droughts)
+
+digital_contribution: |
+  - demonstrates responsible reuse of an existing, well-governed API (KIWIS) rather than
+    building new data pipelines; the MCP pattern is directly reusable for other VMM data
+    sources (radar QPE, water quality, IoT loggers);
+  - builds internal AI/MCP tooling capability and therefore integrates directly the
+    knowledge of VMM experts on the database structure, naming conventions, best practices
+    in building queries (performance wise), quirky features of the data model, …
+  - Central MCP server allows better governance and quality control w.r.t; distributed
+    plugins
+  - keeps the AI use read-only and traceable to source data, supporting explainable and
+    trustworthy AI in a public-sector setting.
+
+conditions: |
+  - Provisional vs. validated data status must be surfaced clearly in LLM responses to
+    avoid decisions being made on unvalidated measurements, KiWIS API exports this
+    information, but the data model (quality codes) needs to be baked into the MCP
+  - MCP server must enforce read-only access — no write path back into KIWIS: security!!
+  - Human expert oversight required for anything safety-relevant (e.g. flood-related
+    bulletins); LLM output should be reviewed, not published unchecked!
+  - Explainability: responses should always cite station ID, timestamp and parameter so a
+    hydrologist can verify manually against the source. Also spokespersons should fully
+    understand the generated contents -> danger of just sending AI generated contents
+    without proper understanding
+  - Skills / capacity: needs some in-house MCP/LLM integration knowledge alongside
+    existing KIWIS expertise as well as domain/deployment specific knowledge
+  - Infrastructure: hosting within VMM's managed environment (proxy/Group Policy
+    constraints) and secure network access to the KIWIS API.
+  - Importance of well-governed, structured back-end data sources, accessible via
+    standardized API.
+  - Reuse/scaling: same MCP approach could later cover radar or water-quality data — worth
+    designing the server generically from the start.
+  - Scaling on technology level: unnecessary API calls from the MCP: optimization or
+    perhaps throttling needed look at technological scalability
+  - Regulatory: should be aligned with Flemish/EU AI governance expectations for
+    public-sector AI, given the water-safety context, though: monitoring only
+
+images:
+  - file: images/hydrological-reporting-mcp/figure-1.png
+    caption: "Architecture: a read-only MCP server wraps the KiWIS API of waterinfo.be and exposes it as tools to an LLM assistant"
+  - file: images/hydrological-reporting-mcp/figure-2.png
+    caption: "The waterinfo.be portal: current situation across the Flemish measurement network"
+  - file: images/hydrological-reporting-mcp/figure-3.png
+    caption: "Example output: a weekly water bulletin compiled by the LLM from MCP tool calls"
+  - file: images/hydrological-reporting-mcp/figure-4.png
+    caption: "Example output: daily rainfall, spatial rainfall and the discharge response of the stations"
+  - file: images/hydrological-reporting-mcp/figure-5.png
+    caption: "Example output: hourly discharge at selected stations, with the rain window shaded"

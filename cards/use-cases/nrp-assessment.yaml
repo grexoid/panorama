@@ -1,0 +1,77 @@
+# Draft generated from submissions/use-cases/AI use case NRP Assessment.docx
+# Please review: add a short `quip`, check the text for left-over template hints.
+# Tags and technologies are added automatically at build time (site/taxonomy.yaml).
+
+name: AI-assisted assessment of National Restoration Plans
+quip: Faster, more consistent first-pass reviews of restoration plans
+summary: |
+  A large language model pre-assesses each National Restoration Plan against the ETC-DI
+  analytical grid and produces referenced draft ratings that assessors review and adjust,
+  instead of starting from a blank page.
+
+main_area: AI Applications and Value Creation
+affiliation: European Environment Agency (EEA) and ETC-DI
+country: EU
+
+challenge: |
+  Regulation (EU) 2024/1991, the Nature Restoration Law, entered into force in August 2024
+  and requires EU Member States to restore habitats in poor ecological condition — at least
+  30% by 2030, rising to 90% by 2050. As part of this, Member States submitted draft
+  National Restoration Plans (NRPs) to the European Commission on 1 September 2026, with
+  final plans due about a year later. The Commission, supported by the EEA and its European
+  Topic Centre on Data Integration (ETC-DI), must assess each plan against a detailed
+  analytical grid covering completeness, transparency, relevance and effectiveness. Doing
+  this manually for dozens of long, structurally complex national submissions is highly
+  time-consuming for the limited number of available reporting and data experts.
+
+proposed_ai: |
+  The use case applies a large language model to pre-assess each National Restoration Plan
+  against an assessment framework (“analytical grid”), producing structured ratings
+  (adequate / inadequate / good / not applicable) per criterion together with supporting
+  references back to the source text. Assessors interact with the tool through a simple web
+  interface, reviewing and adjusting the AI-generated ratings and narrative summary rather
+  than starting each assessment from a blank page. Human judgement remains central: every
+  AI-generated rating is treated as a draft for expert validation, not a final decision.
+
+scope: |
+  - Covers the pre-assessment of National Restoration Plans submitted by EU Member States
+    against the ETC-DI analytical grid.
+  - Main users are EEA/ETC-DI reporting and data experts, and in future national
+    assessors.
+  - Uses the submitted NRP documents together with the analytical grid criteria and
+    reference material; covers both draft and final plan submissions.
+  - Out of scope: fully automated approval or rejection of a plan — every rating remains
+    subject to expert review.
+
+expected_outcome: |
+  (The tool is currently employed to assess official reports in production.) The expected
+  outcome is faster, more consistent first-pass assessments, with experts spending their
+  time on judgement-intensive review rather than repetitive grid completion. Assessors will
+  work from a structured, referenced draft assessment and a generated report for each plan,
+  rather than compiling one from scratch. Success would be demonstrated by shorter
+  turnaround per plan, consistent application of the grid across Member States, and positive
+  feedback from assessors using the tool in their daily workflow.
+
+environmental_contribution: |
+  The use case directly strengthens the evidence base for the Nature Restoration Regulation
+  by making the assessment of National Restoration Plans faster and more consistent,
+  improving the quality and timeliness of feedback to Member States and, ultimately, the
+  environmental monitoring and reporting cycle it supports.
+
+digital_contribution: |
+  The tool is built to run on hardware ranging from a standard laptop up to a high-end GPU
+  server, with a configurable, model-agnostic architecture that lets new AI models be
+  adopted as they mature. This demonstrates a scalable, reusable and responsible approach to
+  introducing automation into reporting workflows, with human oversight built in throughout.
+
+conditions: |
+  - Depends on timely access to submitted NRP documents in a consistent, parseable format
+    (ReportNet 3).
+  - AI outputs must stay transparent and traceable to source text so experts can validate
+    every rating.
+  - Human review remains mandatory; the tool supports, but never replaces, the assessor's
+    judgement.
+  - Runs on flexible infrastructure — from a laptop GPU to an institutional H100 server —
+    via a model switcher, avoiding lock-in to a single AI model or vendor.
+  - Designed for potential reuse in other EEA/Eionet reporting and quality-assessment
+    dataflows.
